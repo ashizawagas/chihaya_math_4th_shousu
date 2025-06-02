@@ -91,7 +91,7 @@ input{font-size:18px;padding:10px;border:2px solid #ddd;border-radius:5px;margin
 const $=id=>document.getElementById(id);
 let score=0,level=1,hp=3,ans,qNum=0,info="",currentProblem;
 const monsters=["🎯","🌟","💎","🎨","🎪","🎭","🎵","🎸","🎲"];
-const levelNames=["単位変換(kg→g)","小数の位","小数の大小","10倍","1/10","小数の構成","足し算","引き算","文章題"];
+const levelNames=["単位変換(kg→g)","小数の位","小数の大小","10倍","1/10","小数の構成","足し算","引き算","小数文章題"];
 
 // ランダムな数値を生成する関数
 function rand(min,max,decimals=0){
@@ -146,19 +146,32 @@ q:`${base5}を十分の一にした数はいくつでしょう？`,
 a:(base5/10).toFixed(3).replace(/\.?0+$/,'')
 };
 
-case 6: // 小数の構成
-const unit=rand(0,1)?0.01:0.1;
-const unitText=unit===0.01?"0.01":"0.1";
-let count, decimal;
-if(unit===0.1){
-count=rand(10,99);
+case 6: // 小数の構成（小数第二位～三位まで拡張）
+const unitType=rand(0,2); // 0:0.1, 1:0.01, 2:0.001
+let unit, unitText, count, decimal;
+
+if(unitType===0){
+// 0.1を使った問題
+unit=0.1;
+unitText="0.1";
+count=rand(10,999); // 10～999個
 decimal=count*0.1;
-}else{
-count=rand(100,999);
+}else if(unitType===1){
+// 0.01を使った問題
+unit=0.01;
+unitText="0.01";
+count=rand(100,999); // 100～999個
 decimal=count*0.01;
+}else{
+// 0.001を使った問題
+unit=0.001;
+unitText="0.001";
+count=rand(100,999); // 100～999個
+decimal=count*0.001;
 }
+
 return {
-q:`${decimal.toFixed(2).replace(/\.?0+$/,'')}は${unitText}をいくつ集めた数でしょう？`,
+q:`${decimal.toFixed(3).replace(/\.?0+$/,'')}は${unitText}をいくつ集めた数でしょう？`,
 a:count.toString()
 };
 
@@ -178,31 +191,92 @@ q:`${sub1} - ${sub2} =`,
 a:(sub1-sub2).toFixed(3).replace(/\.?0+$/,'')
 };
 
-case 9: // 文章題
+case 9: // 小数の文章題
 const problems=[
 ()=>{
-const h1=rand(120,150,1);
-const diff=rand(2,8,1);
+// 長さの問題（リボンやひも）
+const ribbon1=rand(15,35)/10; // 1.5～3.5m
+const ribbon2=rand(10,25)/10; // 1.0～2.5m
+const operation=rand(0,1);
+if(operation===0){
 return {
-q:`太郎さんは身長が${h1}cmです。花子さんは太郎さんより${diff}cm高いです。花子さんの身長は何cmでしょう？`,
-a:(h1+diff).toString()
+q:`赤いリボンの長さは${ribbon1}m、青いリボンの長さは${ribbon2}mです。2本のリボンをつなげると全部で何mになりますか？`,
+a:(ribbon1+ribbon2).toFixed(1).replace(/\.?0+$/,'')
+};
+}else{
+const longer=Math.max(ribbon1,ribbon2);
+const shorter=Math.min(ribbon1,ribbon2);
+return {
+q:`長いリボンは${longer}m、短いリボンは${shorter}mです。長いリボンは短いリボンより何m長いですか？`,
+a:(longer-shorter).toFixed(1).replace(/\.?0+$/,'')
+};
+}
+},
+()=>{
+// 重さの問題（kg単位の小数）
+const weight1=rand(15,45)/10; // 1.5～4.5kg
+const weight2=rand(8,25)/10;  // 0.8～2.5kg
+const operation=rand(0,1);
+if(operation===0){
+return {
+q:`りんごの重さは${weight1}kg、みかんの重さは${weight2}kgです。りんごとみかんを合わせると何kgになりますか？`,
+a:(weight1+weight2).toFixed(1).replace(/\.?0+$/,'')
+};
+}else{
+const heavier=Math.max(weight1,weight2);
+const lighter=Math.min(weight1,weight2);
+return {
+q:`重い荷物は${heavier}kg、軽い荷物は${lighter}kgです。重い荷物は軽い荷物より何kg重いですか？`,
+a:(heavier-lighter).toFixed(1).replace(/\.?0+$/,'')
+};
+}
+},
+()=>{
+// 液体の問題（L単位の小数）
+const liquid1=rand(12,38)/10; // 1.2～3.8L
+const liquid2=rand(8,22)/10;  // 0.8～2.2L
+const operation=rand(0,1);
+if(operation===0){
+return {
+q:`大きいペットボトルには${liquid1}L、小さいペットボトルには${liquid2}Lの水が入っています。2本合わせると何Lになりますか？`,
+a:(liquid1+liquid2).toFixed(1).replace(/\.?0+$/,'')
+};
+}else{
+const more=Math.max(liquid1,liquid2);
+const less=Math.min(liquid1,liquid2);
+return {
+q:`容器Aには${more}L、容器Bには${less}Lの水が入っています。容器Aの方が何L多いですか？`,
+a:(more-less).toFixed(1).replace(/\.?0+$/,'')
+};
+}
+},
+()=>{
+// 時間の問題（時間単位の小数）
+const time1=rand(12,35)/10; // 1.2～3.5時間
+const time2=rand(8,25)/10;  // 0.8～2.5時間
+return {
+q:`宿題をするのに${time1}時間、読書をするのに${time2}時間かかりました。全部で何時間勉強しましたか？`,
+a:(time1+time2).toFixed(1).replace(/\.?0+$/,'')
 };
 },
 ()=>{
-const total=rand(200,300,1);
-const empty=rand(20,50,1);
+// 距離の問題（km単位の小数）
+const dist1=rand(15,45)/10; // 1.5～4.5km
+const dist2=rand(8,28)/10;  // 0.8～2.8km
+const operation=rand(0,1);
+if(operation===0){
 return {
-q:`水の入ったコップの重さは${total}gです。からのコップの重さは${empty}gです。水の重さは何gでしょう？`,
-a:(total-empty).toString()
+q:`学校まで${dist1}km、図書館まで${dist2}km歩きました。全部で何km歩いたでしょうか？`,
+a:(dist1+dist2).toFixed(1).replace(/\.?0+$/,'')
 };
-},
-()=>{
-const tape1=rand(200,400)/100;
-const tape2=rand(150,250)/100;
+}else{
+const longer=Math.max(dist1,dist2);
+const shorter=Math.min(dist1,dist2);
 return {
-q:`赤いテープの長さは${tape1}m、青いテープの長さは${tape2}mです。2本のテープをつなげると全部で何mになりますか？`,
-a:(tape1+tape2).toFixed(2).replace(/\.?0+$/,'')
+q:`遠い道のりは${longer}km、近い道のりは${shorter}kmです。遠い道のりは近い道のりより何km長いですか？`,
+a:(longer-shorter).toFixed(1).replace(/\.?0+$/,'')
 };
+}
 }
 ];
 return problems[rand(0,problems.length-1)]();
