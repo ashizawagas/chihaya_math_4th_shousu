@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>千早算数クエスト - 4年生専用版</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; background: #f0f8ff; margin: 0; padding: 20px; overflow-x: hidden; }
+    .monster { font-size: 80px; transition: transform 0.3s; margin: 20px 0; position: relative; z-index: 10; }
+    .monster.level-up { animation: superLevelUp 3s ease-in-out; }
+    .monster.correct-answer { animation: correctAnswer 1.5s ease-in-out; }
+    
+    @keyframes superLevelUp {
+      0% { transform: scale(1) rotate(0deg); color: #000; }
+      25% { transform: scale(2) rotate(90deg); color: #ff0000; text-shadow: 0 0 30px #ff0000; }
+      50% { transform: scale(3.5) rotate(180deg); color: #0066ff; text-shadow: 0 0 60px #0066ff; }
+      75% { transform: scale(2.5) rotate(270deg); color: #ffff00; text-shadow: 0 0 40px #ffff00; }
+      100% { transform: scale(1) rotate(360deg); color: gold; text-shadow: 0 0 10px gold; }
+    }
+    
+    @keyframes correctAnswer {
+      0% { transform: scale(1); color: #000; }
+      50% { transform: scale(1.5) rotate(-10deg); color: #00ff00; text-shadow: 0 0 20px #00ff00; }
+      100% { transform: scale(1); color: gold; text-shadow: 0 0 10px gold; }
+    }
+    
+    @keyframes firework {
+      0% { transform: scale(0); opacity: 1; }
+      50% { transform: scale(5); opacity: 0.8; }
+      100% { transform: scale(10); opacity: 0; }
+    }
+    
+    @keyframes newCharacter {
+      0% { transform: scale(0) rotate(0deg); opacity: 0; }
+      50% { transform: scale(1.5) rotate(180deg); opacity: 1; }
+      100% { transform: scale(1) rotate(360deg); opacity: 1; }
+    }
+    
+    .fireworks { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+    .firework { position: absolute; width: 10px; height: 10px; border-radius: 50%; animation: firework 3s ease-out; }
+    
+    .question { font-size: 28px; margin: 30px; padding: 20px; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); min-height: 60px; display: flex; align-items: center; justify-content: center; position: relative; z-index: 10; }
+    .status { margin-top: 20px; font-size: 18px; position: relative; z-index: 10; }
+    button { margin: 10px; padding: 15px 30px; font-size: 18px; border: none; border-radius: 8px; background: #4CAF50; color: white; cursor: pointer; transition: background 0.3s; position: relative; z-index: 10; }
+    button:hover { background: #45a049; }
+    .wrong-buttons button { background: #ff6b6b; margin: 5px; padding: 10px 20px; font-size: 16px; }
+    .wrong-buttons button:hover { background: #ff5252; }
+    .next-button { background: #3498db !important; }
+    .next-button:hover { background: #2980b9 !important; }
+    
+    input[type="text"], input[type="number"] { font-size: 20px; padding: 12px; border: 2px solid #ddd; border-radius: 5px; margin: 10px; position: relative; z-index: 10; }
+    .difficulty-info, .grade-info, .game-description, .score-details, .ranking-section { padding: 15px; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin: 15px 0; }
+    .grade-info { font-size: 18px; color: #2c3e50; font-weight: bold; }
+    .game-description { font-size: 18px; color: #444; }
+    
+    .input-form { display: flex; justify-content: center; align-items: center; gap: 20px; margin: 20px 0; flex-wrap: wrap; }
+    .input-group { display: flex; flex-direction: column; align-items: center; }
+    .input-group label { font-size: 16px; font-weight: bold; margin-bottom: 5px; color: #333; }
+    .input-group input { width: 80px; text-align: center; }
+    
+    .character-collection { position: fixed; bottom: 10px; left: 10px; background: rgba(255,255,255,0.9); border-radius: 10px; padding: 10px; max-width: 300px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 5; }
+    .collection-title { font-size: 14px; font-weight: bold; margin-bottom: 5px; color: #333; }
+    .collected-characters { display: flex; flex-wrap: wrap; gap: 5px; }
+    .collected-character { font-size: 24px; padding: 5px; border-radius: 5px; background: #f0f8ff; border: 2px solid #4CAF50; animation: newCharacter 2s ease-in-out; }
+    
+    .ranking-section { background: #fff3cd; }
+    .ranking-title { font-size: 22px; color: #856404; margin-bottom: 10px; font-weight: bold; }
+    .ranking-item { margin: 5px 0; padding: 8px; background: white; border-radius: 5px; font-size: 16px; }
+    .current-rank { background: #d4edda !important; border: 2px solid #28a745; font-weight: bold; }
+    
+    .clear-screen { background: linear-gradient(45deg, #ff9a9e, #fecfef, #fecfef, #ff9a9e); animation: rainbow 2s ease-in-out infinite; }
+    @keyframes rainbow { 0%, 100% { background: linear-gradient(45deg, #ff9a9e, #fecfef); } 50% { background: linear-gradient(45deg, #a8e6cf, #dcedc1); } }
+    
+    .time-display { font-size: 20px; color: #2c3e50; font-weight: bold; background: #e8f5e8; padding: 10px; border-radius: 8px; margin: 10px 0; }
+    
+    .decimal-hint { font-size: 14px; color: #666; margin-top: 5px; }
+  </style>
+</head>
+<body>
+  <h1>🧮 千早算数クエスト</h1>
+
+  <div id="startScreen">
+    <h2>小学4年生の算数をマスターしよう！</h2>
+    <div class="game-description">
+      <p><strong>📚 問題の内容：</strong>小数のたしざん・ひきざん（小数第三位まで）</p>
+      <p><strong>🎯 目標：</strong>レベル10でゲームクリア！モンスターをゲットしよう！</p>
+      <p><strong>❤️ ルール：</strong>間違えると体力が減るよ。体力が0になるとゲーム終了！</p>
+      <p><strong>💡 ヒント：</strong>小数点の位置に注意して計算しよう！</p>
+    </div>
+    <p>あなたの情報を入力してください</p>
+    <div class="input-form">
+      <div class="input-group"><label for="grade">学年</label><input type="number" id="grade" min="1" max="6" value="4"></div>
+      <div class="input-group"><label for="class">組</label><input type="number" id="class" min="1" max="10" placeholder="組"></div>
+      <div class="input-group"><label for="number">出席番号</label><input type="number" id="number" min="1" max="40" placeholder="番号"></div>
+    </div>
+    <button onclick="startGame()">スタート</button>
+  </div>
+
+  <div id="game" style="display:none;">
+    <div class="grade-info">4年生の問題にチャレンジ中！</div>
+    <div class="time-display" id="timeDisplay">経過時間: 00:00</div>
+    <div class="monster" id="monster">🎯</div>
+    <div class="question" id="question">問題を読み込み中...</div>
+    <div class="difficulty-info" id="difficultyInfo"></div>
+    <div id="answerSection">
+      <input type="number" id="answerInput" placeholder="答えを入力" step="0.001">
+      <div class="decimal-hint">小数点以下は必要な分だけ入力してください</div>
+      <br><button onclick="submitAnswer()">こたえる</button>
+    </div>
+    <div id="wrongSection" style="display:none;" class="wrong-buttons">
+      <p id="wrongMessage"></p>
+      <button onclick="retry()">ときなおす</button>
+      <button onclick="nextQuestion()" class="next-button">つぎへ</button>
+    </div>
+    <div class="status" id="status"></div>
+    <div class="status" id="levelInfo"></div>
+    
+    <div class="character-collection" id="characterCollection" style="display:none;">
+      <div class="collection-title">🎁 ゲットしたモンスター</div>
+      <div class="collected-characters" id="collectedCharacters"></div>
+    </div>
+  </div>
+
+  <div id="clearScreen" style="display:none;" class="clear-screen">
+    <h1>🎉 ゲームクリア！ 🎉</h1>
+    <div class="monster" style="font-size: 120px;">👑</div>
+    <h2>おめでとう！レベル10達成！</h2>
+    <div class="time-display" id="clearTime"></div>
+    <div class="score-details">
+      <div><strong>最終スコア:</strong> <span id="clearScore"></span>点</div>
+      <div><strong>獲得モンスター:</strong> <span id="totalMonsters"></span>体</div>
+    </div>
+    <button onclick="restartGame()">もう一度あそぶ</button>
+  </div>
+
+  <div id="scoreBoard" style="display:none;">
+    <h2>🏆 スコアボード</h2>
+    <div class="time-display" id="finalTime"></div>
+    <div class="score-details">
+      <div><strong>学年・組・番号:</strong> <span id="displayName"></span></div>
+      <div><strong>正解数:</strong> <span id="finalScore">0</span></div>
+      <div><strong>評価:</strong> <span id="rank">---</span></div>
+    </div>
+    <div class="ranking-section">
+      <div class="ranking-title">🏅 ランキング</div>
+      <div id="rankingList"></div>
+    </div>
+    <button onclick="restartGame()">もう一度あそぶ</button>
+  </div>
+
+  <script>
+    const $ = id => document.getElementById(id);
+    let score = 0, level = 1, hp = 3, correctAnswer = 0, studentInfo = "", startTime, gameTimer;
+    const monsters = ["🎯", "🌟", "💎", "🎨", "🎪", "🎭", "🎵", "🎸", "🎲", "🎳", "🎺", "🎻", "🎬", "🎤", "🎧", "👑"];
+    let collectedMonsters = [];
+
+    function formatTime(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function updateTimer() {
+      if (startTime) {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        $("timeDisplay").textContent = `経過時間: ${formatTime(elapsed)}`;
+      }
+    }
+
+    function getRankings() {
+      return JSON.parse(localStorage.getItem('mathQuestRankings4th') || '[]').sort((a, b) => b.score - a.score);
+    }
+
+    function saveScore(name, score, time) {
+      const rankings = getRankings();
+      rankings.push({ name, score, time, date: new Date().toLocaleDateString() });
+      const top10 = rankings.sort((a, b) => b.score - a.score).slice(0, 10);
+      localStorage.setItem('mathQuestRankings4th', JSON.stringify(top10));
+      return top10;
+    }
+
+    function roundToThree(num) {
+      return Math.round(num * 1000) / 1000;
+    }
+
+    function generateDecimal(digits) {
+      const beforeDecimal = Math.floor(Math.random() * 99) + 1; // 1-99
+      const afterDecimal = Math.floor(Math.random() * Math.pow(10, digits));
+      const decimalStr = afterDecimal.toString().padStart(digits, '0');
+      return parseFloat(`${beforeDecimal}.${decimalStr}`);
+    }
+
+    function startGame() {
+      const grade = $("grade").value || "4";
+      const classNum = $("class").value || "？";
+      const number = $("number").value || "？";
+      
+      studentInfo = `${grade}年${classNum}組${number}番`;
+      
+      $("startScreen").style.display = "none";
+      $("game").style.display = "block";
+      score = 0; level = 1; hp = 3;
+      collectedMonsters = [monsters[0]];
+      startTime = Date.now();
+      gameTimer = setInterval(updateTimer, 1000);
+      updateLevelDisplay();
+      updateCharacterCollection();
+      generateQuestion();
+    }
+
+    function restartGame() {
+      clearInterval(gameTimer);
+      ["startScreen", "scoreBoard", "game", "characterCollection", "clearScreen"].forEach(id => $(id).style.display = "none");
+      $("startScreen").style.display = "block";
+      document.body.className = "";
+    }
+
+    function createEffect(isLevelUp = false) {
+      $("monster").classList.add(isLevelUp ? "level-up" : "correct-answer");
+      
+      const fireworks = document.createElement('div');
+      fireworks.className = 'fireworks';
+      document.body.appendChild(fireworks);
+      
+      const colors = ['#ff0000', '#ff6600', '#ffff00', '#00ff00', '#0066ff', '#6600ff'];
+      const count = isLevelUp ? 20 : 8;
+      
+      for (let i = 0; i < count; i++) {
+        setTimeout(() => {
+          const firework = document.createElement('div');
+          firework.className = 'firework';
+          firework.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+          firework.style.left = Math.random() * 100 + '%';
+          firework.style.top = Math.random() * 100 + '%';
+          fireworks.appendChild(firework);
+          setTimeout(() => firework.remove(), isLevelUp ? 3000 : 1500);
+        }, i * (isLevelUp ? 150 : 100));
+      }
+      
+      const duration = isLevelUp ? 3000 : 1500;
+      setTimeout(() => {
+        $("monster").classList.remove(isLevelUp ? "level-up" : "correct-answer");
+        fireworks.remove();
+      }, duration);
+    }
+
+    function updateCharacterCollection() {
+      const collectionDiv = $("collectedCharacters");
+      collectionDiv.innerHTML = "";
+      
+      collectedMonsters.forEach((monster, index) => {
+        const charDiv = document.createElement('div');
+        charDiv.className = 'collected-character';
+        charDiv.textContent = monster;
+        charDiv.title = `レベル ${index + 1} でゲット！`;
+        collectionDiv.appendChild(charDiv);
+      });
+      
+      $("characterCollection").style.display = "block";
+    }
+
+    function generateQuestion() {
+      const op = Math.random() > 0.5 ? "+" : "-";
+      let a, b;
+      
+      // レベルに応じて小数の桁数を調整
+      const decimalDigits = Math.min(level <= 3 ? 1 : level <= 6 ? 2 : 3, 3);
+      
+      if (op === "+") {
+        a = generateDecimal(decimalDigits);
+        b = generateDecimal(decimalDigits);
+        correctAnswer = roundToThree(a + b);
+        $("difficultyInfo").textContent = `小数第${decimalDigits}位までのたしざんの問題です`;
+      } else {
+        a = generateDecimal(decimalDigits);
+        b = generateDecimal(decimalDigits);
+        // 引き算の場合、答えが負数にならないように調整
+        if (a < b) {
+          [a, b] = [b, a];
+        }
+        correctAnswer = roundToThree(a - b);
+        $("difficultyInfo").textContent = `小数第${decimalDigits}位までのひきざんの問題です`;
+      }
+      
+      $("question").textContent = `${a} ${op} ${b} = ?`;
+      $("answerInput").value = "";
+      $("answerInput").focus();
+      
+      $("answerSection").style.display = "block";
+      $("wrongSection").style.display = "none";
+    }
+
+    function submitAnswer() {
+      const userAnswer = parseFloat($("answerInput").value);
+      
+      // 小数の比較では微小な誤差を考慮
+      if (Math.abs(userAnswer - correctAnswer) < 0.0001) {
+        score++;
+        createEffect(false);
+        
+        if (score % 5 === 0) {
+          level++;
+          
+          if (level > 10) {
+            showClearScreen();
+            return;
+          }
+          
+          const newMonster = monsters[level - 1] || monsters[monsters.length - 1];
+          $("monster").textContent = newMonster;
+          collectedMonsters.push(newMonster);
+          createEffect(true);
+          updateCharacterCollection();
+        }
+        
+        updateLevelDisplay();
+        $("status").innerHTML = `🎉 正解！ スコア: ${score}`;
+        setTimeout(generateQuestion, 2000);
+      } else {
+        $("wrongMessage").textContent = `💥 まちがい！`;
+        $("answerSection").style.display = "none";
+        $("wrongSection").style.display = "block";
+      }
+    }
+
+    function retry() {
+      hp -= 1;
+      updateLevelDisplay();
+      $("answerSection").style.display = "block";
+      $("wrongSection").style.display = "none";
+      $("answerInput").focus();
+      
+      if (hp <= 0) {
+        setTimeout(showScoreBoard, 1000);
+      }
+    }
+
+    function nextQuestion() {
+      hp -= 1;
+      $("status").innerHTML = `正解は ${correctAnswer} でした`;
+      updateLevelDisplay();
+      
+      if (hp <= 0) {
+        setTimeout(showScoreBoard, 2000);
+      } else {
+        setTimeout(generateQuestion, 2000);
+      }
+    }
+
+    function updateLevelDisplay() {
+      const heartDisplay = hp > 0 ? "❤️".repeat(Math.floor(hp)) + (hp % 1 === 0.5 ? "💔" : "") : "💀";
+      $("levelInfo").innerHTML = `📈 レベル: ${level}/10 | HP: ${heartDisplay}`;
+    }
+
+    function showClearScreen() {
+      clearInterval(gameTimer);
+      const finalTime = Math.floor((Date.now() - startTime) / 1000);
+      
+      $("game").style.display = "none";
+      $("characterCollection").style.display = "none";
+      $("clearScreen").style.display = "block";
+      document.body.classList.add("clear-screen");
+      
+      $("clearTime").textContent = `クリア時間: ${formatTime(finalTime)}`;
+      $("clearScore").textContent = score;
+      $("totalMonsters").textContent = collectedMonsters.length;
+      
+      saveScore(studentInfo, score, finalTime);
+      createEffect(true);
+    }
+
+    function displayRankings(currentScore) {
+      const rankings = getRankings();
+      const rankingList = $("rankingList");
+      
+      let currentRank = rankings.filter(p => p.score > currentScore).length + 1;
+      
+      let rankingHTML = "";
+      const top3 = rankings.slice(0, 3);
+      
+      top3.forEach((player, index) => {
+        const rankEmoji = index === 0 ? "🥇" : index === 1 ? "🥈" : "🥉";
+        rankingHTML += `<div class="ranking-item">${rankEmoji} ${index + 1}位: ${player.score}点</div>`;
+      });
+      
+      rankingHTML += `<div class="ranking-item current-rank">🎯 あなたの順位: ${currentRank}位 (${currentScore}点)</div>`;
+      rankingList.innerHTML = rankingHTML;
+    }
+
+    function showScoreBoard() {
+      clearInterval(gameTimer);
+      const finalTime = Math.floor((Date.now() - startTime) / 1000);
+      
+      $("game").style.display = "none";
+      $("characterCollection").style.display = "none";
+      $("scoreBoard").style.display = "block";
+      $("finalScore").textContent = score;
+      $("displayName").textContent = studentInfo;
+      $("finalTime").textContent = `プレイ時間: ${formatTime(finalTime)}`;
+      
+      saveScore(studentInfo, score, finalTime);
+      displayRankings(score);
+      
+      let rankText = score >= 25 ? "🌟 小数計算マスター！" : 
+                     score >= 15 ? "💡 とてもよくできました！" : 
+                     score >= 5 ? "📘 もう少しがんばろう！" :
+                     "🔰 また挑戦してね！";
+      
+      $("rank").textContent = rankText;
+    }
+
+    $("answerInput").addEventListener("keypress", function(event) {
+      if (event.key === "Enter") {
+        submitAnswer();
+      }
+    });
+  </script>
+</body>
+</html>
