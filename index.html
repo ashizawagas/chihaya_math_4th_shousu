@@ -23,6 +23,8 @@ input{font-size:18px;padding:10px;border:2px solid #ddd;border-radius:5px;margin
 .position-inputs span{font-size:18px;margin:0 5px}
 .position-inputs input{width:80px;font-size:18px}
 .correct-answer{background:#e8f5e8;color:#2e7d32;padding:15px;border-radius:8px;margin:15px 0;font-size:18px;border:2px solid #4caf50}
+.input-with-unit{display:inline-flex;align-items:center;gap:5px}
+.unit-display{font-size:18px;font-weight:bold;color:#333;background:#f5f5f5;padding:10px 15px;border:2px solid #ddd;border-radius:5px}
 </style>
 </head>
 <body>
@@ -48,7 +50,12 @@ input{font-size:18px;padding:10px;border:2px solid #ddd;border-radius:5px;margin
 <div class="monster" id="monster">🎯</div>
 <div class="question" id="q"></div>
 <div id="answer">
-<input type="text" id="input" placeholder="答えを入力" style="display:block">
+<div id="normalInput">
+<div class="input-with-unit">
+<input type="text" id="input" placeholder="答えを入力">
+<span id="unitDisplay" class="unit-display" style="display:none"></span>
+</div>
+</div>
 <div id="positionInputs" class="position-inputs" style="display:none">
 <span>1の位:</span><input type="number" id="ones" min="0" max="9">
 <span>0.1の位:</span><input type="number" id="tenths" min="0" max="9">
@@ -89,7 +96,7 @@ input{font-size:18px;padding:10px;border:2px solid #ddd;border-radius:5px;margin
 
 <script>
 const $=id=>document.getElementById(id);
-let score=0,level=1,hp=3,ans,qNum=0,info="",currentProblem;
+let score=0,level=1,hp=3,ans,qNum=0,info="",currentProblem,currentUnit="";
 const monsters=["🎯","🌟","💎","🎨","🎪","🎭","🎵","🎸","🎲"];
 const levelNames=["単位変換(kg→g)","小数の位","小数の大小","10倍","1/10","小数の構成","足し算","引き算","小数文章題"];
 
@@ -107,7 +114,8 @@ const kg=rand(1,9);
 const g=rand(1,999);
 return {
 q:`${kg}kg${g}gをkgで表しましょう`,
-a:(kg+g/1000).toFixed(3).replace(/\.?0+$/,'')
+a:(kg+g/1000).toFixed(3).replace(/\.?0+$/,''),
+unit:"kg"
 };
 
 case 2: // 小数の位
@@ -172,7 +180,8 @@ decimal=count*0.001;
 
 return {
 q:`${decimal.toFixed(3).replace(/\.?0+$/,'')}は${unitText}をいくつ集めた数でしょう？`,
-a:count.toString()
+a:count.toString(),
+unit:"個"
 };
 
 case 7: // 足し算
@@ -201,14 +210,16 @@ const operation=rand(0,1);
 if(operation===0){
 return {
 q:`赤いリボンの長さは${ribbon1}m、青いリボンの長さは${ribbon2}mです。2本のリボンをつなげると全部で何mになりますか？`,
-a:(ribbon1+ribbon2).toFixed(1).replace(/\.?0+$/,'')
+a:(ribbon1+ribbon2).toFixed(1).replace(/\.?0+$/,''),
+unit:"m"
 };
 }else{
 const longer=Math.max(ribbon1,ribbon2);
 const shorter=Math.min(ribbon1,ribbon2);
 return {
 q:`長いリボンは${longer}m、短いリボンは${shorter}mです。長いリボンは短いリボンより何m長いですか？`,
-a:(longer-shorter).toFixed(1).replace(/\.?0+$/,'')
+a:(longer-shorter).toFixed(1).replace(/\.?0+$/,''),
+unit:"m"
 };
 }
 },
@@ -220,14 +231,16 @@ const operation=rand(0,1);
 if(operation===0){
 return {
 q:`りんごの重さは${weight1}kg、みかんの重さは${weight2}kgです。りんごとみかんを合わせると何kgになりますか？`,
-a:(weight1+weight2).toFixed(1).replace(/\.?0+$/,'')
+a:(weight1+weight2).toFixed(1).replace(/\.?0+$/,''),
+unit:"kg"
 };
 }else{
 const heavier=Math.max(weight1,weight2);
 const lighter=Math.min(weight1,weight2);
 return {
 q:`重い荷物は${heavier}kg、軽い荷物は${lighter}kgです。重い荷物は軽い荷物より何kg重いですか？`,
-a:(heavier-lighter).toFixed(1).replace(/\.?0+$/,'')
+a:(heavier-lighter).toFixed(1).replace(/\.?0+$/,''),
+unit:"kg"
 };
 }
 },
@@ -239,14 +252,16 @@ const operation=rand(0,1);
 if(operation===0){
 return {
 q:`大きいペットボトルには${liquid1}L、小さいペットボトルには${liquid2}Lの水が入っています。2本合わせると何Lになりますか？`,
-a:(liquid1+liquid2).toFixed(1).replace(/\.?0+$/,'')
+a:(liquid1+liquid2).toFixed(1).replace(/\.?0+$/,''),
+unit:"L"
 };
 }else{
 const more=Math.max(liquid1,liquid2);
 const less=Math.min(liquid1,liquid2);
 return {
 q:`容器Aには${more}L、容器Bには${less}Lの水が入っています。容器Aの方が何L多いですか？`,
-a:(more-less).toFixed(1).replace(/\.?0+$/,'')
+a:(more-less).toFixed(1).replace(/\.?0+$/,''),
+unit:"L"
 };
 }
 },
@@ -256,7 +271,8 @@ const time1=rand(12,35)/10; // 1.2～3.5時間
 const time2=rand(8,25)/10;  // 0.8～2.5時間
 return {
 q:`宿題をするのに${time1}時間、読書をするのに${time2}時間かかりました。全部で何時間勉強しましたか？`,
-a:(time1+time2).toFixed(1).replace(/\.?0+$/,'')
+a:(time1+time2).toFixed(1).replace(/\.?0+$/,''),
+unit:"時間"
 };
 },
 ()=>{
@@ -267,14 +283,16 @@ const operation=rand(0,1);
 if(operation===0){
 return {
 q:`学校まで${dist1}km、図書館まで${dist2}km歩きました。全部で何km歩いたでしょうか？`,
-a:(dist1+dist2).toFixed(1).replace(/\.?0+$/,'')
+a:(dist1+dist2).toFixed(1).replace(/\.?0+$/,''),
+unit:"km"
 };
 }else{
 const longer=Math.max(dist1,dist2);
 const shorter=Math.min(dist1,dist2);
 return {
 q:`遠い道のりは${longer}km、近い道のりは${shorter}kmです。遠い道のりは近い道のりより何km長いですか？`,
-a:(longer-shorter).toFixed(1).replace(/\.?0+$/,'')
+a:(longer-shorter).toFixed(1).replace(/\.?0+$/,''),
+unit:"km"
 };
 }
 }
@@ -312,10 +330,11 @@ setTimeout(()=>$("monster").classList.remove("level-up"),2000);
 currentProblem=generateProblem(level);
 $("q").textContent=currentProblem.q;
 ans=currentProblem.a;
+currentUnit=currentProblem.unit||"";
 
 // レベル2の場合は位ごとの入力欄を表示
 if(level===2){
-$("input").style.display="none";
+$("normalInput").style.display="none";
 $("positionInputs").style.display="flex";
 $("ones").value="";
 $("tenths").value="";
@@ -323,10 +342,18 @@ $("hundredths").value="";
 $("thousandths").value="";
 $("ones").focus();
 }else{
-$("input").style.display="block";
+$("normalInput").style.display="block";
 $("positionInputs").style.display="none";
 $("input").value="";
 $("input").focus();
+}
+
+// 単位表示の設定
+if(currentUnit){
+$("unitDisplay").textContent=currentUnit;
+$("unitDisplay").style.display="inline-block";
+}else{
+$("unitDisplay").style.display="none";
 }
 
 $("answer").style.display="block";
@@ -390,7 +417,7 @@ if(level===2){
 const parts=ans.split(',');
 displayAnswer=`1の位：${parts[0]}、0.1の位：${parts[1]}、0.01の位：${parts[2]}、0.001の位：${parts[3]}`;
 }else{
-displayAnswer=ans;
+displayAnswer=ans+(currentUnit?currentUnit:"");
 }
 $("correctAnswerText").textContent=displayAnswer;
 $("correctAnswerDisplay").style.display="block";
