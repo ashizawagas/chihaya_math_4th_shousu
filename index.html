@@ -136,12 +136,6 @@ select{font-size:16px;padding:10px;border:2px solid #ddd;border-radius:5px;margi
 ・タイマー付きでスピード勝負！</p>
 </div>
 
-<div>
-<input type="number" id="grade" value="4" min="1" max="6" placeholder="学年">年
-<input type="number" id="class" min="1" max="10" placeholder="組">組
-<input type="number" id="number" min="1" max="40" placeholder="番号">番
-</div>
-
 <button class="mode-button select" onclick="showLevelSelect()">🎯 選べるモード</button>
 <button class="mode-button practice" onclick="startPractice()">🎓 練習モード</button>
 <button class="mode-button summary" onclick="startSummary()">🏆 まとめモード</button>
@@ -372,7 +366,7 @@ flash.remove();
 },3000);
 }
 
-// 問題生成関数（省略 - 元のコードと同じ）
+// 問題生成関数
 function generateProblem(level){
 switch(level){
 case 1: // 単位変換
@@ -559,7 +553,7 @@ return problems[rand(0,problems.length-1)]();
 }
 }
 
-// タイマー関連の関数（省略 - 元のコードと同じ）
+// タイマー関連の関数
 function startTimer(){
 startTime=Date.now();
 timerInterval=setInterval(updateTimer,100);
@@ -591,13 +585,10 @@ return `${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0
 return "00:00.00";
 }
 
-// ランキング関連の関数（省略 - 元のコードと同じ）
+// ランキング関連の関数
 function saveRecord(time){
 const records=JSON.parse(localStorage.getItem('mathQuestRecords')||'[]');
 const newRecord={
-grade:$("grade").value||"4",
-class:$("class").value||"？",
-number:$("number").value||"？",
 time:time,
 timestamp:Date.now(),
 date:formatDateTime(Date.now())
@@ -653,8 +644,6 @@ startGame();
 }
 
 function startGame(){
-const g=$("grade").value||"4",c=$("class").value||"？",n=$("number").value||"？";
-info=`${g}年${c}組${n}番`;
 $("start").style.display="none";
 $("levelSelect").style.display="none";
 $("game").style.display="block";
