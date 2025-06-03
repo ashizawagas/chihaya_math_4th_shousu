@@ -21,7 +21,12 @@ button.practice{background:#FF9800}
 button.practice:hover{background:#F57C00}
 button.summary{background:#9C27B0}
 button.summary:hover{background:#7B1FA2}
+button.select{background:#4CAF50}
+button.select:hover{background:#45a049}
+button.home{background:#f44336;margin:5px;padding:8px 16px;font-size:14px}
+button.home:hover{background:#d32f2f}
 input{font-size:18px;padding:10px;border:2px solid #ddd;border-radius:5px;margin:10px}
+select{font-size:16px;padding:10px;border:2px solid #ddd;border-radius:5px;margin:10px}
 .status{margin:15px 0;font-size:18px}
 .info{padding:15px;background:white;border-radius:10px;margin:15px 0}
 .mode-info{padding:20px;background:#e3f2fd;border-radius:10px;margin:15px 0;border-left:5px solid #2196F3}
@@ -38,6 +43,13 @@ input{font-size:18px;padding:10px;border:2px solid #ddd;border-radius:5px;margin
 .progress{background:#f0f0f0;border-radius:10px;padding:10px;margin:15px 0}
 .progress-bar{background:#4CAF50;height:20px;border-radius:10px;transition:width 0.3s}
 .streak-counter{font-size:20px;color:#FF5722;font-weight:bold;margin:10px 0}
+.timer{font-size:24px;color:#f44336;font-weight:bold;margin:15px 0;padding:10px;background:#fff;border-radius:10px;border:2px solid #f44336}
+.ranking{background:#fff3e0;padding:20px;border-radius:10px;margin:20px 0;border:2px solid #ff9800}
+.ranking h3{color:#e65100;margin-bottom:15px}
+.ranking-item{padding:12px;margin:8px 0;background:#f5f5f5;border-radius:8px;font-size:16px;line-height:1.4}
+.my-rank{background:#e8f5e8;border:2px solid #4caf50;font-weight:bold}
+.level-select{padding:20px;background:#e8f5e8;border-radius:10px;margin:15px 0;border-left:5px solid #4CAF50}
+.record-time{color:#666;font-size:14px;margin-top:4px}
 </style>
 </head>
 <body>
@@ -51,6 +63,28 @@ input{font-size:18px;padding:10px;border:2px solid #ddd;border-radius:5px;margin
 </div>
 
 <h3>モードを選択してください</h3>
+
+<div class="level-select">
+<h4>🎯 選べるモード</h4>
+<p>・好きなレベルを選んで練習<br>
+・何度でも挑戦可能<br>
+・レベルアップはなし</p>
+<div>
+<label>レベル選択: </label>
+<select id="levelSelect">
+<option value="1">レベル1 - 単位変換(kg→g)</option>
+<option value="2">レベル2 - 小数の位</option>
+<option value="3">レベル3 - 小数の大小</option>
+<option value="4">レベル4 - 10倍</option>
+<option value="5">レベル5 - 1/10</option>
+<option value="6">レベル6 - 小数の構成</option>
+<option value="7">レベル7 - 足し算</option>
+<option value="8">レベル8 - 引き算</option>
+<option value="9">レベル9 - 小数文章題</option>
+</select>
+</div>
+</div>
+
 <div class="mode-info">
 <h4>🔸 練習モード</h4>
 <p>・各レベルで5問連続正解でレベルアップ<br>
@@ -61,7 +95,8 @@ input{font-size:18px;padding:10px;border:2px solid #ddd;border-radius:5px;margin
 <h4>🔸 まとめモード</h4>
 <p>・各レベル1問ずつの真剣勝負<br>
 ・一問でも間違えるとゲームオーバー<br>
-・全9レベル制覇を目指そう</p>
+・全9レベル制覇を目指そう<br>
+・タイマー付きでスピード勝負！</p>
 </div>
 
 <div>
@@ -70,11 +105,16 @@ input{font-size:18px;padding:10px;border:2px solid #ddd;border-radius:5px;margin
 <input type="number" id="number" min="1" max="40" placeholder="番号">番
 </div>
 
+<button class="mode-button select" onclick="startSelect()">🎯 選べるモード</button>
 <button class="mode-button practice" onclick="startPractice()">🎓 練習モード</button>
 <button class="mode-button summary" onclick="startSummary()">🏆 まとめモード</button>
 </div>
 
 <div id="game" style="display:none">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+<button class="home" onclick="goHome()">🏠 トップ画面にもどる</button>
+<div id="timerDisplay" style="display:none" class="timer">⏰ <span id="timerText">00:00</span></div>
+</div>
 <div class="info">
 <span id="modeDisplay"></span> | レベル<span id="lv">1</span>/9 - <span id="lvInfo"></span>
 </div>
@@ -123,6 +163,9 @@ input{font-size:18px;padding:10px;border:2px solid #ddd;border-radius:5px;margin
 <div class="info">
 <p>到達レベル: <span id="finalLevel"></span>/9</p>
 <p>獲得スコア: <span id="finalScore1"></span>点</p>
+<div id="gameoverTime" style="display:none">
+<p>経過時間: <span id="finalTime1"></span></p>
+</div>
 </div>
 <button onclick="restart()">もう一度</button>
 </div>
@@ -131,13 +174,24 @@ input{font-size:18px;padding:10px;border:2px solid #ddd;border-radius:5px;margin
 <h1>🎉 ゲームクリア！ 🎉</h1>
 <div class="monster" style="font-size:120px">👑</div>
 <h2>おめでとう！全レベル制覇！</h2>
-<div class="info">最終スコア: <span id="finalScore2"></span>点</div>
+<div class="info">
+<p>最終スコア: <span id="finalScore2"></span>点</p>
+<div id="clearTime" style="display:none">
+<p>クリアタイム: <span id="finalTime2"></span></p>
+</div>
+</div>
+<div id="ranking" style="display:none" class="ranking">
+<h3>🏆 ランキング</h3>
+<div id="myRankDisplay" class="ranking-item my-rank"></div>
+<div id="top3Display"></div>
+</div>
 <button onclick="restart()">もう一度</button>
 </div>
 
 <script>
 const $=id=>document.getElementById(id);
 let score=0,level=1,hp=1,ans,streak=0,info="",currentProblem,currentUnit="",gameMode="";
+let startTime,timerInterval;
 const monsters=["🎯","🌟","💎","🎨","🎪","🎭","🎵","🎸","🎲"];
 const levelNames=["単位変換(kg→g)","小数の位","小数の大小","10倍","1/10","小数の構成","足し算","引き算","小数文章題"];
 
@@ -145,6 +199,17 @@ const levelNames=["単位変換(kg→g)","小数の位","小数の大小","10倍
 function rand(min,max,decimals=0){
 const num=Math.random()*(max-min)+min;
 return decimals?parseFloat(num.toFixed(decimals)):Math.floor(num);
+}
+
+// 日時をフォーマットする関数
+function formatDateTime(timestamp){
+const date=new Date(timestamp);
+const year=date.getFullYear();
+const month=(date.getMonth()+1).toString().padStart(2,'0');
+const day=date.getDate().toString().padStart(2,'0');
+const hours=date.getHours().toString().padStart(2,'0');
+const minutes=date.getMinutes().toString().padStart(2,'0');
+return `${year}/${month}/${day} ${hours}:${minutes}`;
 }
 
 // 問題生成関数
@@ -334,6 +399,78 @@ return problems[rand(0,problems.length-1)]();
 }
 }
 
+// タイマー関連の関数
+function startTimer(){
+startTime=Date.now();
+timerInterval=setInterval(updateTimer,100);
+}
+
+function updateTimer(){
+const elapsed=Date.now()-startTime;
+const minutes=Math.floor(elapsed/60000);
+const seconds=Math.floor((elapsed%60000)/1000);
+const milliseconds=Math.floor((elapsed%1000)/10);
+$("timerText").textContent=`${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}.${milliseconds.toString().padStart(2,'0')}`;
+}
+
+function stopTimer(){
+if(timerInterval){
+clearInterval(timerInterval);
+timerInterval=null;
+}
+}
+
+function getElapsedTime(){
+if(startTime){
+const elapsed=Date.now()-startTime;
+const minutes=Math.floor(elapsed/60000);
+const seconds=Math.floor((elapsed%60000)/1000);
+const milliseconds=Math.floor((elapsed%1000)/10);
+return `${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}.${milliseconds.toString().padStart(2,'0')}`;
+}
+return "00:00.00";
+}
+
+// ランキング関連の関数
+function saveRecord(time){
+const records=JSON.parse(localStorage.getItem('mathQuestRecords')||'[]');
+const newRecord={
+grade:$("grade").value||"4",
+class:$("class").value||"？",
+number:$("number").value||"？",
+time:time,
+timestamp:Date.now(),
+date:formatDateTime(Date.now())
+};
+records.push(newRecord);
+records.sort((a,b)=>a.timestamp-b.timestamp); // 時間順でソート（早い方が上位）
+localStorage.setItem('mathQuestRecords',JSON.stringify(records));
+return records;
+}
+
+function displayRanking(currentTime){
+const records=saveRecord(currentTime);
+const myRecord=records[records.length-1];
+const myRank=records.findIndex(r=>r.timestamp===myRecord.timestamp)+1;
+const top3=records.slice(0,3);
+
+$("myRankDisplay").innerHTML=`あなたの順位: ${myRank}位 / ${records.length}人中<br>タイム: ${currentTime}<br><div class="record-time">記録日時: ${myRecord.date}</div>`;
+
+let top3Html="";
+top3.forEach((record,index)=>{
+const medal=["🥇","🥈","🥉"][index];
+top3Html+=`<div class="ranking-item">${medal} ${index+1}位: ${record.time}<div class="record-time">記録日時: ${record.date}</div></div>`;
+});
+$("top3Display").innerHTML=top3Html;
+$("ranking").style.display="block";
+}
+
+function startSelect(){
+gameMode="select";
+level=parseInt($("levelSelect").value);
+startGame();
+}
+
 function startPractice(){
 gameMode="practice";
 startGame();
@@ -349,7 +486,20 @@ const g=$("grade").value||"4",c=$("class").value||"？",n=$("number").value||"�
 info=`${g}年${c}組${n}番`;
 $("start").style.display="none";
 $("game").style.display="block";
-score=0;level=1;hp=1;streak=0;
+score=0;
+if(gameMode!=="select"){
+level=1;
+}
+hp=1;streak=0;
+
+// タイマーの設定
+if(gameMode==="summary"){
+$("timerDisplay").style.display="block";
+startTimer();
+}else{
+$("timerDisplay").style.display="none";
+}
+
 updateDisplay();
 nextQ();
 }
@@ -360,7 +510,11 @@ $("lvInfo").textContent=levelNames[level-1];
 $("score").textContent=score;
 $("monster").textContent=monsters[level-1];
 
-if(gameMode==="practice"){
+if(gameMode==="select"){
+$("modeDisplay").textContent="🎯 選べるモード";
+$("practiceProgress").style.display="none";
+$("hpDisplay").style.display="none";
+}else if(gameMode==="practice"){
 $("modeDisplay").textContent="🎓 練習モード";
 $("practiceProgress").style.display="block";
 $("hpDisplay").style.display="none";
@@ -455,7 +609,7 @@ $("wrongResult").style.display="none";
 // 不正解
 if(gameMode==="practice"){
 streak=0; // 連続正解数をリセット
-}else{
+}else if(gameMode==="summary"){
 hp--; // まとめモードでは即ゲームオーバー
 }
 $("monster").classList.add("wrong");
@@ -484,23 +638,42 @@ $("correctAnswerText").textContent=displayAnswer;
 }
 
 function showGameOver(){
+stopTimer();
 $("game").style.display="none";
 $("gameover").style.display="block";
 $("finalLevel").textContent=level;
 $("finalScore1").textContent=score;
 if(gameMode==="summary"){
 $("gameoverMsg").textContent="残念！間違えてしまいました";
+const finalTime=getElapsedTime();
+$("finalTime1").textContent=finalTime;
+$("gameoverTime").style.display="block";
 }
 }
 
 function showClear(){
+stopTimer();
 $("game").style.display="none";
 $("clear").style.display="block";
 $("finalScore2").textContent=score;
 document.body.classList.add("clear-screen");
+
+if(gameMode==="summary"){
+const finalTime=getElapsedTime();
+$("finalTime2").textContent=finalTime;
+$("clearTime").style.display="block";
+displayRanking(finalTime);
+}
+}
+
+function goHome(){
+if(confirm("トップ画面に戻りますか？進行状況は失われます。")){
+restart();
+}
 }
 
 function restart(){
+stopTimer();
 location.reload();
 }
 
