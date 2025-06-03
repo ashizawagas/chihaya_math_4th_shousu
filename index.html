@@ -25,6 +25,10 @@ button.select{background:#4CAF50}
 button.select:hover{background:#45a049}
 button.home{background:#f44336;margin:5px;padding:8px 16px;font-size:14px}
 button.home:hover{background:#d32f2f}
+button.back{background:#607d8b;margin:10px;padding:12px 24px;font-size:16px}
+button.back:hover{background:#455a64}
+button.level-button{background:#4CAF50;padding:15px 30px;font-size:18px;margin:10px;display:block;width:80%;max-width:400px;margin-left:auto;margin-right:auto}
+button.level-button:hover{background:#45a049}
 input{font-size:18px;padding:10px;border:2px solid #ddd;border-radius:5px;margin:10px}
 select{font-size:16px;padding:10px;border:2px solid #ddd;border-radius:5px;margin:10px}
 .status{margin:15px 0;font-size:18px}
@@ -50,6 +54,53 @@ select{font-size:16px;padding:10px;border:2px solid #ddd;border-radius:5px;margi
 .my-rank{background:#e8f5e8;border:2px solid #4caf50;font-weight:bold}
 .level-select{padding:20px;background:#e8f5e8;border-radius:10px;margin:15px 0;border-left:5px solid #4CAF50}
 .record-time{color:#666;font-size:14px;margin-top:4px}
+.level-selection{padding:20px;background:#e8f5e8;border-radius:10px;margin:15px 0;border-left:5px solid #4CAF50}
+
+/* 派手なアニメーション */
+.fireworks{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1000}
+.firework{position:absolute;width:4px;height:4px;border-radius:50%;animation:firework 2s ease-out forwards}
+@keyframes firework{
+0%{transform:translateY(100vh) scale(0);opacity:1}
+15%{transform:translateY(20vh) scale(1);opacity:1}
+100%{transform:translateY(20vh) scale(0);opacity:0}
+}
+.particle{position:absolute;width:6px;height:6px;border-radius:50%;animation:particle 1.5s ease-out forwards}
+@keyframes particle{
+0%{transform:translate(0,0) scale(1);opacity:1}
+100%{transform:translate(var(--dx),var(--dy)) scale(0);opacity:0}
+}
+
+/* 正解時のキラキラエフェクト */
+.sparkle{position:absolute;width:8px;height:8px;background:gold;border-radius:50%;animation:sparkle 1s ease-out forwards;pointer-events:none}
+@keyframes sparkle{
+0%{transform:scale(0) rotate(0deg);opacity:1}
+50%{transform:scale(1.5) rotate(180deg);opacity:1}
+100%{transform:scale(0) rotate(360deg);opacity:0}
+}
+
+/* レベルアップ時の超派手エフェクト */
+.levelup-explosion{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:1001}
+.explosion-ring{position:absolute;border:4px solid;border-radius:50%;animation:explosion-ring 2s ease-out forwards}
+@keyframes explosion-ring{
+0%{width:0;height:0;opacity:1;border-color:#ff0}
+50%{border-color:#f80}
+100%{width:800px;height:800px;opacity:0;border-color:#f00}
+}
+
+/* クリア時の超ド派手エフェクト */
+.clear-celebration{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1002}
+.confetti{position:absolute;width:10px;height:10px;animation:confetti 3s ease-out forwards}
+@keyframes confetti{
+0%{transform:translateY(-100vh) rotate(0deg);opacity:1}
+100%{transform:translateY(100vh) rotate(720deg);opacity:0}
+}
+
+/* 画面全体の祝福エフェクト */
+.celebration-flash{position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(circle,rgba(255,215,0,0.3) 0%,transparent 70%);animation:celebration-flash 0.5s ease-in-out 3;pointer-events:none;z-index:999}
+@keyframes celebration-flash{
+0%,100%{opacity:0}
+50%{opacity:1}
+}
 </style>
 </head>
 <body>
@@ -69,20 +120,6 @@ select{font-size:16px;padding:10px;border:2px solid #ddd;border-radius:5px;margi
 <p>・好きなレベルを選んで練習<br>
 ・何度でも挑戦可能<br>
 ・レベルアップはなし</p>
-<div>
-<label>レベル選択: </label>
-<select id="levelSelect">
-<option value="1">レベル1 - 単位変換(kg→g)</option>
-<option value="2">レベル2 - 小数の位</option>
-<option value="3">レベル3 - 小数の大小</option>
-<option value="4">レベル4 - 10倍</option>
-<option value="5">レベル5 - 1/10</option>
-<option value="6">レベル6 - 小数の構成</option>
-<option value="7">レベル7 - 足し算</option>
-<option value="8">レベル8 - 引き算</option>
-<option value="9">レベル9 - 小数文章題</option>
-</select>
-</div>
 </div>
 
 <div class="mode-info">
@@ -93,7 +130,7 @@ select{font-size:16px;padding:10px;border:2px solid #ddd;border-radius:5px;margi
 </div>
 <div class="mode-info">
 <h4>🔸 まとめモード</h4>
-<p>・各レベル1問ずつの真剣勝負<br>
+<p>・各レベル5問正解でレベルアップ<br>
 ・一問でも間違えるとゲームオーバー<br>
 ・全9レベル制覇を目指そう<br>
 ・タイマー付きでスピード勝負！</p>
@@ -105,9 +142,31 @@ select{font-size:16px;padding:10px;border:2px solid #ddd;border-radius:5px;margi
 <input type="number" id="number" min="1" max="40" placeholder="番号">番
 </div>
 
-<button class="mode-button select" onclick="startSelect()">🎯 選べるモード</button>
+<button class="mode-button select" onclick="showLevelSelect()">🎯 選べるモード</button>
 <button class="mode-button practice" onclick="startPractice()">🎓 練習モード</button>
 <button class="mode-button summary" onclick="startSummary()">🏆 まとめモード</button>
+</div>
+
+<div id="levelSelect" style="display:none">
+<h2>🎯 選べるモード - レベル選択</h2>
+<div class="info">
+<p>好きなレベルを選んで練習しましょう！</p>
+</div>
+
+<div class="level-selection">
+<h3>レベルを選択してください</h3>
+<button class="level-button" onclick="startSelect(1)">レベル1 - 単位変換(kg→g)</button>
+<button class="level-button" onclick="startSelect(2)">レベル2 - 小数の位</button>
+<button class="level-button" onclick="startSelect(3)">レベル3 - 小数の大小</button>
+<button class="level-button" onclick="startSelect(4)">レベル4 - 10倍</button>
+<button class="level-button" onclick="startSelect(5)">レベル5 - 1/10</button>
+<button class="level-button" onclick="startSelect(6)">レベル6 - 小数の構成</button>
+<button class="level-button" onclick="startSelect(7)">レベル7 - 足し算</button>
+<button class="level-button" onclick="startSelect(8)">レベル8 - 引き算</button>
+<button class="level-button" onclick="startSelect(9)">レベル9 - 小数文章題</button>
+</div>
+
+<button class="back" onclick="goBackToStart()">← もどる</button>
 </div>
 
 <div id="game" style="display:none">
@@ -123,6 +182,12 @@ select{font-size:16px;padding:10px;border:2px solid #ddd;border-radius:5px;margi
 <div class="progress-bar" id="progressBar" style="width:0%"></div>
 </div>
 <div class="streak-counter">連続正解: <span id="streakCount">0</span>/5</div>
+</div>
+<div id="summaryProgress" style="display:none">
+<div class="progress">
+<div class="progress-bar" id="summaryProgressBar" style="width:0%"></div>
+</div>
+<div class="streak-counter">レベル内正解数: <span id="summaryCount">0</span>/5</div>
 </div>
 <div class="monster" id="monster">🎯</div>
 <div class="question" id="q"></div>
@@ -190,7 +255,7 @@ select{font-size:16px;padding:10px;border:2px solid #ddd;border-radius:5px;margi
 
 <script>
 const $=id=>document.getElementById(id);
-let score=0,level=1,hp=1,ans,streak=0,info="",currentProblem,currentUnit="",gameMode="";
+let score=0,level=1,hp=1,ans,streak=0,summaryLevelCount=0,info="",currentProblem,currentUnit="",gameMode="";
 let startTime,timerInterval;
 const monsters=["🎯","🌟","💎","🎨","🎪","🎭","🎵","🎸","🎲"];
 const levelNames=["単位変換(kg→g)","小数の位","小数の大小","10倍","1/10","小数の構成","足し算","引き算","小数文章題"];
@@ -212,7 +277,102 @@ const minutes=date.getMinutes().toString().padStart(2,'0');
 return `${year}/${month}/${day} ${hours}:${minutes}`;
 }
 
-// 問題生成関数
+// 派手なアニメーション関数
+function createSparkles(){
+const colors=['#FFD700','#FF69B4','#00BFFF','#32CD32','#FF4500'];
+for(let i=0;i<15;i++){
+const sparkle=document.createElement('div');
+sparkle.className='sparkle';
+sparkle.style.background=colors[Math.floor(Math.random()*colors.length)];
+sparkle.style.left=Math.random()*window.innerWidth+'px';
+sparkle.style.top=Math.random()*window.innerHeight+'px';
+sparkle.style.animationDelay=Math.random()*0.5+'s';
+document.body.appendChild(sparkle);
+setTimeout(()=>sparkle.remove(),1000);
+}
+}
+
+function createFireworks(){
+const fireworksContainer=document.createElement('div');
+fireworksContainer.className='fireworks';
+document.body.appendChild(fireworksContainer);
+
+for(let i=0;i<8;i++){
+setTimeout(()=>{
+const firework=document.createElement('div');
+firework.className='firework';
+firework.style.left=Math.random()*window.innerWidth+'px';
+firework.style.background=`hsl(${Math.random()*360},100%,50%)`;
+fireworksContainer.appendChild(firework);
+
+setTimeout(()=>{
+for(let j=0;j<12;j++){
+const particle=document.createElement('div');
+particle.className='particle';
+particle.style.left=firework.style.left;
+particle.style.top='20vh';
+particle.style.background=`hsl(${Math.random()*360},100%,50%)`;
+const angle=j*30;
+const distance=100+Math.random()*100;
+particle.style.setProperty('--dx',Math.cos(angle*Math.PI/180)*distance+'px');
+particle.style.setProperty('--dy',Math.sin(angle*Math.PI/180)*distance+'px');
+fireworksContainer.appendChild(particle);
+setTimeout(()=>particle.remove(),1500);
+}
+},300);
+},i*200);
+}
+setTimeout(()=>fireworksContainer.remove(),3000);
+}
+
+function createLevelUpExplosion(){
+const explosion=document.createElement('div');
+explosion.className='levelup-explosion';
+document.body.appendChild(explosion);
+
+for(let i=0;i<5;i++){
+const ring=document.createElement('div');
+ring.className='explosion-ring';
+ring.style.animationDelay=i*0.1+'s';
+ring.style.left='-400px';
+ring.style.top='-400px';
+explosion.appendChild(ring);
+}
+
+setTimeout(()=>explosion.remove(),2000);
+}
+
+function createClearCelebration(){
+const celebration=document.createElement('div');
+celebration.className='clear-celebration';
+document.body.appendChild(celebration);
+
+const flash=document.createElement('div');
+flash.className='celebration-flash';
+document.body.appendChild(flash);
+
+for(let i=0;i<50;i++){
+const confetti=document.createElement('div');
+confetti.className='confetti';
+confetti.style.left=Math.random()*window.innerWidth+'px';
+confetti.style.background=`hsl(${Math.random()*360},100%,50%)`;
+confetti.style.animationDelay=Math.random()*2+'s';
+if(Math.random()>0.5){
+confetti.style.borderRadius='0';
+confetti.style.width='15px';
+confetti.style.height='5px';
+}
+celebration.appendChild(confetti);
+}
+
+createFireworks();
+setTimeout(()=>{
+celebration.remove();
+flash.remove();
+},3000);
+}
+
+// 問題生成関数（省略 - 元のコードと同じ）
 function generateProblem(level){
 switch(level){
 case 1: // 単位変換
@@ -399,7 +559,7 @@ return problems[rand(0,problems.length-1)]();
 }
 }
 
-// タイマー関連の関数
+// タイマー関連の関数（省略 - 元のコードと同じ）
 function startTimer(){
 startTime=Date.now();
 timerInterval=setInterval(updateTimer,100);
@@ -431,7 +591,7 @@ return `${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0
 return "00:00.00";
 }
 
-// ランキング関連の関数
+// ランキング関連の関数（省略 - 元のコードと同じ）
 function saveRecord(time){
 const records=JSON.parse(localStorage.getItem('mathQuestRecords')||'[]');
 const newRecord={
@@ -443,7 +603,7 @@ timestamp:Date.now(),
 date:formatDateTime(Date.now())
 };
 records.push(newRecord);
-records.sort((a,b)=>a.timestamp-b.timestamp); // 時間順でソート（早い方が上位）
+records.sort((a,b)=>a.timestamp-b.timestamp);
 localStorage.setItem('mathQuestRecords',JSON.stringify(records));
 return records;
 }
@@ -465,9 +625,20 @@ $("top3Display").innerHTML=top3Html;
 $("ranking").style.display="block";
 }
 
-function startSelect(){
+// 画面遷移関数
+function showLevelSelect(){
+$("start").style.display="none";
+$("levelSelect").style.display="block";
+}
+
+function goBackToStart(){
+$("levelSelect").style.display="none";
+$("start").style.display="block";
+}
+
+function startSelect(selectedLevel){
 gameMode="select";
-level=parseInt($("levelSelect").value);
+level=selectedLevel;
 startGame();
 }
 
@@ -485,14 +656,14 @@ function startGame(){
 const g=$("grade").value||"4",c=$("class").value||"？",n=$("number").value||"？";
 info=`${g}年${c}組${n}番`;
 $("start").style.display="none";
+$("levelSelect").style.display="none";
 $("game").style.display="block";
 score=0;
 if(gameMode!=="select"){
 level=1;
 }
-hp=1;streak=0;
+hp=1;streak=0;summaryLevelCount=0;
 
-// タイマーの設定
 if(gameMode==="summary"){
 $("timerDisplay").style.display="block";
 startTimer();
@@ -513,10 +684,12 @@ $("monster").textContent=monsters[level-1];
 if(gameMode==="select"){
 $("modeDisplay").textContent="🎯 選べるモード";
 $("practiceProgress").style.display="none";
+$("summaryProgress").style.display="none";
 $("hpDisplay").style.display="none";
 }else if(gameMode==="practice"){
 $("modeDisplay").textContent="🎓 練習モード";
 $("practiceProgress").style.display="block";
+$("summaryProgress").style.display="none";
 $("hpDisplay").style.display="none";
 $("streakCount").textContent=streak;
 const progress=(streak/5)*100;
@@ -524,8 +697,12 @@ $("progressBar").style.width=progress+"%";
 }else{
 $("modeDisplay").textContent="🏆 まとめモード";
 $("practiceProgress").style.display="none";
+$("summaryProgress").style.display="block";
 $("hpDisplay").style.display="inline";
 $("hp").textContent=hp;
+$("summaryCount").textContent=summaryLevelCount;
+const summaryProgress=(summaryLevelCount/5)*100;
+$("summaryProgressBar").style.width=summaryProgress+"%";
 }
 }
 
@@ -536,13 +713,16 @@ if(level>=9){showClear();return}
 level++;
 streak=0;
 $("monster").classList.add("level-up");
+createLevelUpExplosion();
 setTimeout(()=>$("monster").classList.remove("level-up"),2000);
 }
 // まとめモードでレベルアップチェック
-else if(gameMode==="summary" && score>=level){
+else if(gameMode==="summary" && summaryLevelCount>=5){
 if(level>=9){showClear();return}
 level++;
+summaryLevelCount=0;
 $("monster").classList.add("level-up");
+createLevelUpExplosion();
 setTimeout(()=>$("monster").classList.remove("level-up"),2000);
 }
 
@@ -551,7 +731,6 @@ $("q").textContent=currentProblem.q;
 ans=currentProblem.a;
 currentUnit=currentProblem.unit||"";
 
-// レベル2の場合は位ごとの入力欄を表示
 if(level===2){
 $("normalInput").style.display="none";
 $("positionInputs").style.display="flex";
@@ -567,7 +746,6 @@ $("input").value="";
 $("input").focus();
 }
 
-// 単位表示の設定
 if(currentUnit){
 $("unitDisplay").textContent=currentUnit;
 $("unitDisplay").style.display="inline-block";
@@ -600,17 +778,20 @@ if(userAns===ans){
 score++;
 if(gameMode==="practice"){
 streak++;
+}else if(gameMode==="summary"){
+summaryLevelCount++;
 }
 $("monster").classList.add("correct");
+createSparkles();
 setTimeout(()=>$("monster").classList.remove("correct"),1000);
 $("correctResult").style.display="block";
 $("wrongResult").style.display="none";
 }else{
 // 不正解
 if(gameMode==="practice"){
-streak=0; // 連続正解数をリセット
+streak=0;
 }else if(gameMode==="summary"){
-hp--; // まとめモードでは即ゲームオーバー
+hp--;
 }
 $("monster").classList.add("wrong");
 setTimeout(()=>$("monster").classList.remove("wrong"),1000);
@@ -657,6 +838,7 @@ $("game").style.display="none";
 $("clear").style.display="block";
 $("finalScore2").textContent=score;
 document.body.classList.add("clear-screen");
+createClearCelebration();
 
 if(gameMode==="summary"){
 const finalTime=getElapsedTime();
