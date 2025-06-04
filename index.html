@@ -472,7 +472,7 @@ selectedChoice=choice;
 submit();
 }
 
-// 問題生成関数（省略 - 前回のコードと同じ）
+// 問題生成関数
 function generateProblem(level){
 switch(level){
 case 1: // 単位変換
@@ -571,19 +571,25 @@ a:correctSide,
 type:'choice'
 };
 
-case 5: // 小数 何倍か
-const base5=rand(1,99)/100;
+case 5: // 小数 何倍か（修正版）
+const multipliers = [10, 100, 1000];
+const multiplier = multipliers[rand(0, multipliers.length-1)];
+const base5 = rand(1, 99) / 100;
+const result = base5 * multiplier;
 return {
-q:`${base5}を何倍すると${(base5*10).toFixed(2).replace(/\.?0+$/,'')}になりますか？`,
-a:"10"
+q: `${base5}を何倍すると${result.toFixed(3).replace(/\.?0+$/, '')}になりますか？`,
+a: multiplier.toString()
 };
 
-case 6: // 小数 何分の一か
-const base6=rand(10,99)/10;
+case 6: // 小数 何分の一か（修正版）
+const divisors = [10, 100, 1000];
+const divisor = divisors[rand(0, divisors.length-1)];
+const base6 = rand(10, 999) / 10;
+const result6 = base6 / divisor;
 return {
-q:`${(base6/10).toFixed(2).replace(/\.?0+$/,'')}は${base6}の何分の一ですか？`,
-a:"10",
-unit:"分の一"
+q: `${result6.toFixed(3).replace(/\.?0+$/, '')}は${base6}の何分の一ですか？`,
+a: divisor.toString(),
+unit: "分の一"
 };
 
 case 7: // 小数の構成
