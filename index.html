@@ -117,8 +117,25 @@ select{font-size:16px;padding:10px;border:2px solid #ddd;border-radius:5px;margi
 <body>
 <h1>🧮 デジタル算数ラボ</h1>
 
-<div id="start">
+<div id="userInfo">
+<h2>はじめに情報を入力してください</h2>
+<div class="user-info">
+<h3>あなたの情報を教えてください</h3>
+<div>
+<input type="number" id="grade" value="4" min="1" max="6" placeholder="学年">年
+<input type="number" id="class" min="1" max="10" placeholder="組">組
+<input type="number" id="number" min="1" max="40" placeholder="番号">番
+</div>
+<button onclick="saveUserInfo()">次へ</button>
+</div>
+</div>
+
+<div id="start" style="display:none">
 <h2>小学4年生の算数をマスターしよう！</h2>
+<div class="user-display">
+<strong>ユーザー情報：</strong><span id="userDisplay"></span>
+<button onclick="changeUserInfo()" style="margin-left:10px;padding:5px 10px;font-size:12px;background:#607d8b">変更</button>
+</div>
 <div class="info">
 <p><strong>📚 内容：</strong>小数の理解・計算・文章題（11段階レベル制）</p>
 <p><strong>🎯 目標：</strong>レベル11でゲームクリア！</p>
@@ -154,6 +171,9 @@ select{font-size:16px;padding:10px;border:2px solid #ddd;border-radius:5px;margi
 
 <div id="levelSelect" style="display:none">
 <h2>🎯 選べるモード - レベル選択</h2>
+<div class="user-display">
+<strong>ユーザー情報：</strong><span id="userDisplay2"></span>
+</div>
 <div class="info">
 <p>好きなレベルを選んで練習しましょう！</p>
 </div>
@@ -278,9 +298,61 @@ select{font-size:16px;padding:10px;border:2px solid #ddd;border-radius:5px;margi
 <script>
 const $=id=>document.getElementById(id);
 let score=0,level=1,hp=1,ans,streak=0,summaryLevelCount=0,selectCorrectCount=0,info="",currentProblem,currentUnit="",gameMode="";
-let startTime,timerInterval,selectedChoice="";
+let startTime,timerInterval,selectedChoice="",userGrade="",userClass="",userNumber="";
 const monsters=["🎯","🌟","💎","🎨","🎪","🎭","🎵","🎸","🎲","👑","🌈"];
 const levelNames=["たんいへんかん","小数の仕組み","小数の位","小数の大小","小数 何倍か","小数 何分の一か","小数のこうせい","小数の足し算","小数のひき算","小数文章問題","小数の色々な見方"];
+
+// ページ読み込み時にユーザー情報をチェック
+window.addEventListener('load', function() {
+const savedUserInfo = localStorage.getItem('userInfo');
+if (savedUserInfo) {
+const userInfo = JSON.parse(savedUserInfo);
+userGrade = userInfo.grade;
+userClass = userInfo.class;
+userNumber = userInfo.number;
+info = `${userGrade}年${userClass}組${userNumber}番`;
+$("userInfo").style.display = "none";
+$("start").style.display = "block";
+updateUserDisplay();
+}
+});
+
+// ユーザー情報を保存して画面遷移
+function saveUserInfo() {
+userGrade = $("grade").value || "4";
+userClass = $("class").value || "？";
+userNumber = $("number").value || "？";
+info = `${userGrade}年${userClass}組${userNumber}番`;
+
+// ローカルストレージに保存
+const userInfo = {
+grade: userGrade,
+class: userClass,
+number: userNumber
+};
+localStorage.setItem('userInfo', JSON.stringify(userInfo));
+
+$("userInfo").style.display = "none";
+$("start").style.display = "block";
+updateUserDisplay();
+}
+
+// ユーザー情報表示を更新
+function updateUserDisplay() {
+const displayText = `${userGrade}年${userClass}組${userNumber}番`;
+$("userDisplay").textContent = displayText;
+$("userDisplay2").textContent = displayText;
+}
+
+// ユーザー情報を変更
+function changeUserInfo() {
+$("start").style.display = "none";
+$("userInfo").style.display = "block";
+// 現在の値を入力欄に設定
+$("grade").value = userGrade;
+$("class").value = userClass;
+$("number").value = userNumber;
+}
 
 // ランダムな数値を生成する関数
 function rand(min,max,decimals=0){
@@ -755,6 +827,9 @@ return "00:00.00";
 function saveRecord(time){
 const records=JSON.parse(localStorage.getItem('mathQuestRecords')||'[]');
 const newRecord={
+grade:userGrade,
+class:userClass,
+number:userNumber,
 time:time,
 timestamp:Date.now(),
 date:formatDateTime(Date.now())
