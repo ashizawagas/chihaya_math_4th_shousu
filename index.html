@@ -29,6 +29,8 @@ button.back{background:#607d8b;margin:10px;padding:12px 24px;font-size:16px}
 button.back:hover{background:#455a64}
 button.level-button{background:#4CAF50;padding:15px 30px;font-size:18px;margin:10px;display:block;width:80%;max-width:400px;margin-left:auto;margin-right:auto}
 button.level-button:hover{background:#45a049}
+button.choice-button{background:#2196F3;padding:15px 30px;font-size:20px;margin:15px;min-width:120px}
+button.choice-button:hover{background:#1976D2}
 input{font-size:18px;padding:10px;border:2px solid #ddd;border-radius:5px;margin:10px}
 select{font-size:16px;padding:10px;border:2px solid #ddd;border-radius:5px;margin:10px}
 .status{margin:15px 0;font-size:18px}
@@ -55,6 +57,7 @@ select{font-size:16px;padding:10px;border:2px solid #ddd;border-radius:5px;margi
 .level-select{padding:20px;background:#e8f5e8;border-radius:10px;margin:15px 0;border-left:5px solid #4CAF50}
 .record-time{color:#666;font-size:14px;margin-top:4px}
 .level-selection{padding:20px;background:#e8f5e8;border-radius:10px;margin:15px 0;border-left:5px solid #4CAF50}
+.choice-area{margin:20px 0}
 
 /* 派手なアニメーション */
 .fireworks{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1000}
@@ -109,8 +112,8 @@ select{font-size:16px;padding:10px;border:2px solid #ddd;border-radius:5px;margi
 <div id="start">
 <h2>小学4年生の算数をマスターしよう！</h2>
 <div class="info">
-<p><strong>📚 内容：</strong>小数の理解・計算・文章題（9段階レベル制）</p>
-<p><strong>🎯 目標：</strong>レベル9でゲームクリア！</p>
+<p><strong>📚 内容：</strong>小数の理解・計算・文章題（10段階レベル制）</p>
+<p><strong>🎯 目標：</strong>レベル10でゲームクリア！</p>
 </div>
 
 <h3>モードを選択してください</h3>
@@ -132,7 +135,7 @@ select{font-size:16px;padding:10px;border:2px solid #ddd;border-radius:5px;margi
 <h4>🔸 まとめモード</h4>
 <p>・各レベル5問正解でレベルアップ<br>
 ・一問でも間違えるとゲームオーバー<br>
-・全9レベル制覇を目指そう<br>
+・全10レベル制覇を目指そう<br>
 ・タイマー付きでスピード勝負！</p>
 </div>
 
@@ -149,15 +152,16 @@ select{font-size:16px;padding:10px;border:2px solid #ddd;border-radius:5px;margi
 
 <div class="level-selection">
 <h3>レベルを選択してください</h3>
-<button class="level-button" onclick="startSelect(1)">レベル1 - 単位変換(kg→g)</button>
-<button class="level-button" onclick="startSelect(2)">レベル2 - 小数の位</button>
-<button class="level-button" onclick="startSelect(3)">レベル3 - 小数の大小</button>
-<button class="level-button" onclick="startSelect(4)">レベル4 - 10倍</button>
-<button class="level-button" onclick="startSelect(5)">レベル5 - 1/10</button>
-<button class="level-button" onclick="startSelect(6)">レベル6 - 小数の構成</button>
-<button class="level-button" onclick="startSelect(7)">レベル7 - 足し算</button>
-<button class="level-button" onclick="startSelect(8)">レベル8 - 引き算</button>
-<button class="level-button" onclick="startSelect(9)">レベル9 - 小数文章題</button>
+<button class="level-button" onclick="startSelect(1)">レベル1 - たんいへんかん(kg→g)</button>
+<button class="level-button" onclick="startSelect(2)">レベル2 - しょうすうのしくみ</button>
+<button class="level-button" onclick="startSelect(3)">レベル3 - しょうすうのい</button>
+<button class="level-button" onclick="startSelect(4)">レベル4 - しょうすうのだいしょう</button>
+<button class="level-button" onclick="startSelect(5)">レベル5 - 10ばい</button>
+<button class="level-button" onclick="startSelect(6)">レベル6 - 1/10</button>
+<button class="level-button" onclick="startSelect(7)">レベル7 - しょうすうのこうせい</button>
+<button class="level-button" onclick="startSelect(8)">レベル8 - たしざん</button>
+<button class="level-button" onclick="startSelect(9)">レベル9 - ひきざん</button>
+<button class="level-button" onclick="startSelect(10)">レベル10 - しょうすうぶんしょうだい</button>
 </div>
 
 <button class="back" onclick="goBackToStart()">← もどる</button>
@@ -169,7 +173,7 @@ select{font-size:16px;padding:10px;border:2px solid #ddd;border-radius:5px;margi
 <div id="timerDisplay" style="display:none" class="timer">⏰ <span id="timerText">00:00</span></div>
 </div>
 <div class="info">
-<span id="modeDisplay"></span> | レベル<span id="lv">1</span>/9 - <span id="lvInfo"></span>
+<span id="modeDisplay"></span> | レベル<span id="lv">1</span>/10 - <span id="lvInfo"></span>
 </div>
 <div id="practiceProgress" style="display:none">
 <div class="progress">
@@ -198,7 +202,11 @@ select{font-size:16px;padding:10px;border:2px solid #ddd;border-radius:5px;margi
 <span>0.01の位:</span><input type="number" id="hundredths" min="0" max="9">
 <span>0.001の位:</span><input type="number" id="thousandths" min="0" max="9">
 </div>
-<br><button onclick="submit()">こたえる</button>
+<div id="choiceButtons" class="choice-area" style="display:none">
+<button class="choice-button" onclick="selectChoice('left')">左</button>
+<button class="choice-button" onclick="selectChoice('right')">右</button>
+</div>
+<br><button id="submitButton" onclick="submit()">こたえる</button>
 </div>
 <div id="result" style="display:none">
 <div id="correctResult" style="display:none">
@@ -220,7 +228,7 @@ select{font-size:16px;padding:10px;border:2px solid #ddd;border-radius:5px;margi
 <div class="monster" style="font-size:120px">😵</div>
 <h2 id="gameoverMsg">残念！間違えてしまいました</h2>
 <div class="info">
-<p>到達レベル: <span id="finalLevel"></span>/9</p>
+<p>到達レベル: <span id="finalLevel"></span>/10</p>
 <p>獲得スコア: <span id="finalScore1"></span>点</p>
 <div id="gameoverTime" style="display:none">
 <p>経過時間: <span id="finalTime1"></span></p>
@@ -250,9 +258,9 @@ select{font-size:16px;padding:10px;border:2px solid #ddd;border-radius:5px;margi
 <script>
 const $=id=>document.getElementById(id);
 let score=0,level=1,hp=1,ans,streak=0,summaryLevelCount=0,info="",currentProblem,currentUnit="",gameMode="";
-let startTime,timerInterval;
-const monsters=["🎯","🌟","💎","🎨","🎪","🎭","🎵","🎸","🎲"];
-const levelNames=["単位変換(kg→g)","小数の位","小数の大小","10倍","1/10","小数の構成","足し算","引き算","小数文章題"];
+let startTime,timerInterval,selectedChoice="";
+const monsters=["🎯","🌟","💎","🎨","🎪","🎭","🎵","🎸","🎲","👑"];
+const levelNames=["たんいへんかん(kg→g)","しょうすうのしくみ","しょうすうのい","しょうすうのだいしょう","10ばい","1/10","しょうすうのこうせい","たしざん","ひきざん","しょうすうぶんしょうだい"];
 
 // ランダムな数値を生成する関数
 function rand(min,max,decimals=0){
@@ -366,19 +374,36 @@ flash.remove();
 },3000);
 }
 
+// 選択ボタン用の関数
+function selectChoice(choice){
+selectedChoice=choice;
+submit();
+}
+
 // 問題生成関数
 function generateProblem(level){
 switch(level){
-case 1: // 単位変換
+case 1: // 単位変換（ひらがな）
 const kg=rand(1,9);
 const g=rand(1,999);
 return {
-q:`${kg}kg${g}gをkgで表しましょう`,
+q:`${kg}kg${g}gを kgで あらわしましょう`,
 a:(kg+g/1000).toFixed(3).replace(/\.?0+$/,''),
 unit:"kg"
 };
 
-case 2: // 小数の位
+case 2: // 小数のしくみ
+const problems2=[
+()=>({q:"0.1は1の何分の一ですか？",a:"10",unit:"分の一"}),
+()=>({q:"0.01は1の何分の一ですか？",a:"100",unit:"分の一"}),
+()=>({q:"0.001は1の何分の一ですか？",a:"1000",unit:"分の一"}),
+()=>({q:"0.1は何倍すると1になりますか？",a:"10",unit:"倍"}),
+()=>({q:"0.01は何倍すると1になりますか？",a:"100",unit:"倍"}),
+()=>({q:"0.001は何倍すると1になりますか？",a:"1000",unit:"倍"})
+];
+return problems2[rand(0,problems2.length-1)]();
+
+case 3: // 小数の位
 const ones=rand(1,9);
 const tenths=rand(0,9);
 const hundredths=rand(0,9);
@@ -389,32 +414,40 @@ a:`${ones},${tenths},${hundredths},${thousandths}`,
 type:'position'
 };
 
-case 3: // 小数の大小
+case 4: // 小数の大小
 const a1=rand(10,99)/10;
 const a2=a1+(rand(0,1)?0.01:-0.01)*rand(1,5);
 const smaller=Math.min(a1,a2);
+const larger=Math.max(a1,a2);
+const isLeftSmaller=a1<a2;
 const question=rand(0,1)?"小さいほう":"大きいほう";
-const answer=question==="小さいほう"?smaller:Math.max(a1,a2);
+let correctSide;
+if(question==="小さいほう"){
+correctSide=isLeftSmaller?"left":"right";
+}else{
+correctSide=isLeftSmaller?"right":"left";
+}
 return {
 q:`${a1}と${a2}で${question}を選びましょう`,
-a:answer.toFixed(2).replace(/\.?0+$/,'')
+a:correctSide,
+type:'choice'
 };
 
-case 4: // 10倍
+case 5: // 10倍
 const base=rand(1,999)/100;
 return {
 q:`${base}を10倍した数はいくつでしょう？`,
 a:(base*10).toFixed(3).replace(/\.?0+$/,'')
 };
 
-case 5: // 1/10
-const base5=rand(10,999)/10;
+case 6: // 1/10
+const base6=rand(10,999)/10;
 return {
-q:`${base5}を十分の一にした数はいくつでしょう？`,
-a:(base5/10).toFixed(3).replace(/\.?0+$/,'')
+q:`${base6}を十分の一にした数はいくつでしょう？`,
+a:(base6/10).toFixed(3).replace(/\.?0+$/,'')
 };
 
-case 6: // 小数の構成
+case 7: // 小数の構成（ひらがな）
 const unitType=rand(0,2);
 let unit, unitText, count, decimal;
 
@@ -436,12 +469,12 @@ decimal=count*0.001;
 }
 
 return {
-q:`${decimal.toFixed(3).replace(/\.?0+$/,'')}は${unitText}をいくつ集めた数でしょう？`,
+q:`${decimal.toFixed(3).replace(/\.?0+$/,'')}は${unitText}をいくつ あつめた かずでしょう？`,
 a:count.toString(),
-unit:"個"
+unit:"こ"
 };
 
-case 7: // 足し算
+case 8: // 足し算
 const add1=rand(100,999)/100;
 const add2=rand(100,999)/100;
 return {
@@ -449,7 +482,7 @@ q:`${add1} + ${add2} =`,
 a:(add1+add2).toFixed(3).replace(/\.?0+$/,'')
 };
 
-case 8: // 引き算
+case 9: // 引き算
 const sub1=rand(500,999)/100;
 const sub2=rand(100,400)/100;
 return {
@@ -457,8 +490,8 @@ q:`${sub1} - ${sub2} =`,
 a:(sub1-sub2).toFixed(3).replace(/\.?0+$/,'')
 };
 
-case 9: // 小数の文章題
-const problems=[
+case 10: // 小数の文章題
+const problems10=[
 ()=>{
 const ribbon1=rand(15,35)/10;
 const ribbon2=rand(10,25)/10;
@@ -549,7 +582,7 @@ unit:"km"
 }
 }
 ];
-return problems[rand(0,problems.length-1)]();
+return problems10[rand(0,problems10.length-1)]();
 }
 }
 
@@ -698,7 +731,7 @@ $("summaryProgressBar").style.width=summaryProgress+"%";
 function nextQ(){
 // 練習モードでレベルアップチェック
 if(gameMode==="practice" && streak>=5){
-if(level>=9){showClear();return}
+if(level>=10){showClear();return}
 level++;
 streak=0;
 $("monster").classList.add("level-up");
@@ -707,7 +740,7 @@ setTimeout(()=>$("monster").classList.remove("level-up"),2000);
 }
 // まとめモードでレベルアップチェック
 else if(gameMode==="summary" && summaryLevelCount>=5){
-if(level>=9){showClear();return}
+if(level>=10){showClear();return}
 level++;
 summaryLevelCount=0;
 $("monster").classList.add("level-up");
@@ -719,22 +752,37 @@ currentProblem=generateProblem(level);
 $("q").textContent=currentProblem.q;
 ans=currentProblem.a;
 currentUnit=currentProblem.unit||"";
+selectedChoice="";
 
-if(level===2){
+// 入力方法の設定
+if(level===3){
+// 小数の位の問題
 $("normalInput").style.display="none";
 $("positionInputs").style.display="flex";
+$("choiceButtons").style.display="none";
+$("submitButton").style.display="inline-block";
 $("ones").value="";
 $("tenths").value="";
 $("hundredths").value="";
 $("thousandths").value="";
 $("ones").focus();
+}else if(currentProblem.type==='choice'){
+// 選択問題
+$("normalInput").style.display="none";
+$("positionInputs").style.display="none";
+$("choiceButtons").style.display="block";
+$("submitButton").style.display="none";
 }else{
+// 通常の入力
 $("normalInput").style.display="block";
 $("positionInputs").style.display="none";
+$("choiceButtons").style.display="none";
+$("submitButton").style.display="inline-block";
 $("input").value="";
 $("input").focus();
 }
 
+// 単位表示の設定
 if(currentUnit){
 $("unitDisplay").textContent=currentUnit;
 $("unitDisplay").style.display="inline-block";
@@ -749,12 +797,14 @@ updateDisplay();
 
 function submit(){
 let userAns;
-if(level===2){
+if(level===3){
 const ones=$("ones").value||"0";
 const tenths=$("tenths").value||"0";
 const hundredths=$("hundredths").value||"0";
 const thousandths=$("thousandths").value||"0";
 userAns=`${ones},${tenths},${hundredths},${thousandths}`;
+}else if(currentProblem.type==='choice'){
+userAns=selectedChoice;
 }else{
 userAns=$("input").value.trim();
 }
@@ -798,9 +848,11 @@ updateDisplay();
 
 function displayCorrectAnswer(){
 let displayAnswer;
-if(level===2){
+if(level===3){
 const parts=ans.split(',');
 displayAnswer=`1の位：${parts[0]}、0.1の位：${parts[1]}、0.01の位：${parts[2]}、0.001の位：${parts[3]}`;
+}else if(currentProblem.type==='choice'){
+displayAnswer=ans==='left'?'左':'右';
 }else{
 displayAnswer=ans+(currentUnit?currentUnit:"");
 }
