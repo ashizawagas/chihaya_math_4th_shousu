@@ -75,22 +75,12 @@ input:focus{border-color:#2196f3;outline:none;box-shadow:0 0 5px rgba(33,150,243
 .nav-btn{background:#6c757d;color:white;padding:8px 16px;font-size:14px;border:none;border-radius:6px;cursor:pointer}
 .nav-btn:hover{background:#5a6268}
 .timer{font-size:20px;font-weight:bold;color:#d32f2f;margin:10px 0;padding:10px;background:white;border-radius:8px;border:2px solid #f44336}
-.ranking{background:white;border-radius:10px;padding:20px;margin:20px 0;border:2px solid #ffd700}
-.ranking h3{color:#d32f2f;margin-bottom:15px}
-.ranking-item{display:flex;justify-content:space-between;align-items:center;padding:8px 15px;margin:5px 0;border-radius:5px;background:#f8f9fa}
-.ranking-item.current{background:#e8f5e8;border:2px solid #4caf50;font-weight:bold}
-.ranking-item.top3{background:#fff3cd;border:2px solid #ffc107}
-.rank-medal{font-size:20px;margin-right:10px}
 .points-display{background:linear-gradient(45deg,#ffd700,#ffed4e);color:#d32f2f;padding:15px;border-radius:10px;margin:15px 0;border:3px solid #ff6b6b;font-weight:bold;font-size:18px;animation:pointsGlow 2s infinite}
 @keyframes pointsGlow{0%,100%{box-shadow:0 0 15px rgba(255,215,0,0.5)}50%{box-shadow:0 0 30px rgba(255,215,0,0.8)}}
 .points-earned{background:#e8f5e8;color:#2e7d32;padding:10px;border-radius:8px;margin:10px 0;border:2px solid #4caf50;font-weight:bold;animation:pointsEarn 2s}
 @keyframes pointsEarn{0%{transform:scale(1)}50%{transform:scale(1.2)}100%{transform:scale(1)}}
 .session-points{background:#e3f2fd;color:#1976d2;padding:8px;border-radius:6px;margin:5px 0;border:1px solid #2196f3;font-size:14px}
 .player-id{background:#f3e5f5;color:#7b1fa2;padding:10px;border-radius:8px;margin:10px 0;border:2px solid #9c27b0;font-size:14px;font-weight:bold}
-.global-ranking{background:#fff3cd;border-radius:10px;padding:20px;margin:20px 0;border:2px solid #ffc107}
-.global-ranking h3{color:#f57c00;margin-bottom:15px}
-.global-ranking-item{display:flex;justify-content:space-between;align-items:center;padding:10px 15px;margin:5px 0;border-radius:5px;background:#fff8e1}
-.global-ranking-item.my-rank{background:#e8f5e8;border:2px solid #4caf50;font-weight:bold}
 .position-inputs{display:flex;align-items:center;justify-content:center;gap:10px;margin:20px 0}
 .position-inputs span{font-size:18px;margin:0 5px}
 .position-inputs input{width:80px;font-size:18px}
@@ -218,14 +208,7 @@ input:focus{border-color:#2196f3;outline:none;box-shadow:0 0 5px rgba(33,150,243
 <p>正解数: <span id="finalScore1"></span>問</p>
 <p id="finalTime" style="display:none">経過時間: <span id="finalTimeValue"></span></p>
 <div id="gameoverPoints" class="points-earned" style="display:none">🎉 獲得ポイント: <span id="gameoverPointsValue">0</span>P</div>
-</div>
-<div id="globalRankingGameover" class="global-ranking" style="display:none">
-<h3>🌍 全体ランキング</h3>
-<div id="globalRankingListGameover"></div>
-<div style="margin-top:15px;padding-top:15px;border-top:2px solid #ddd;">
-<h4>あなたの順位</h4>
-<div id="myGlobalRankGameover"></div>
-</div>
+<div id="currentPointsGameover" class="points-display">💰 現在のポイント: <span id="currentPointsGameoverValue">0</span>P</div>
 </div>
 <button onclick="restart()">もう一度</button>
 </div>
@@ -238,22 +221,7 @@ input:focus{border-color:#2196f3;outline:none;box-shadow:0 0 5px rgba(33,150,243
 <p>最終スコア: <span id="finalScore2"></span>問正解</p>
 <p id="clearTime">クリア時間: <span id="clearTimeValue"></span></p>
 <div id="pointsEarned" class="points-earned" style="display:none">🎉 獲得ポイント: <span id="earnedPoints">0</span>P</div>
-</div>
-<div id="rankingDisplay" class="ranking" style="display:none">
-<h3>🏆 ランキング（トップ3）</h3>
-<div id="rankingList"></div>
-<div id="myRanking" style="margin-top:15px;padding-top:15px;border-top:2px solid #ddd;">
-<h4>あなたの記録</h4>
-<div id="myRankingItem"></div>
-</div>
-</div>
-<div id="globalRankingClear" class="global-ranking" style="display:none">
-<h3>🌍 全体ランキング</h3>
-<div id="globalRankingListClear"></div>
-<div style="margin-top:15px;padding-top:15px;border-top:2px solid #ddd;">
-<h4>あなたの順位</h4>
-<div id="myGlobalRankClear"></div>
-</div>
+<div id="currentPointsClear" class="points-display">💰 現在のポイント: <span id="currentPointsClearValue">0</span>P</div>
 </div>
 <div id="hiddenStageUnlock" class="hidden-stage-unlock" style="display:none;padding:20px;margin:20px;border-radius:15px;">
 <h3>🌟 隠しステージが解放されました！ 🌟</h3>
@@ -272,14 +240,7 @@ input:focus{border-color:#2196f3;outline:none;box-shadow:0 0 5px rgba(33,150,243
 <p>隠しステージ全10問完全制覇</p>
 <p>最終スコア: <span id="hiddenFinalScore"></span>問正解</p>
 <div id="hiddenPointsEarned" class="points-earned" style="display:none">🎉 獲得ポイント: <span id="hiddenEarnedPoints">0</span>P</div>
-</div>
-<div id="globalRankingHidden" class="global-ranking" style="display:none">
-<h3>🌍 全体ランキング</h3>
-<div id="globalRankingListHidden"></div>
-<div style="margin-top:15px;padding-top:15px;border-top:2px solid #ddd;">
-<h4>あなたの順位</h4>
-<div id="myGlobalRankHidden"></div>
-</div>
+<div id="currentPointsHidden" class="points-display">💰 現在のポイント: <span id="currentPointsHiddenValue">0</span>P</div>
 </div>
 <button onclick="restart()" style="padding:15px 30px;font-size:20px;background:#4CAF50;color:white;border:none;border-radius:10px;cursor:pointer;">トップに戻る</button>
 </div>
@@ -318,68 +279,6 @@ function initializePlayerId(){
     }
 }
 
-// グローバルランキングシステム
-function saveToGlobalRanking(points){
-    try{
-        let globalRanking=JSON.parse(localStorage.getItem('globalRanking')||'[]');
-        const existingIndex=globalRanking.findIndex(entry=>entry.id===playerId);
-        
-        if(existingIndex>=0){
-            if(globalRanking[existingIndex].points<points){
-                globalRanking[existingIndex].points=points;
-                globalRanking[existingIndex].lastUpdate=new Date().toISOString();
-            }
-        }else{
-            globalRanking.push({
-                id:playerId,
-                points:points,
-                lastUpdate:new Date().toISOString()
-            });
-        }
-        
-        globalRanking.sort((a,b)=>b.points-a.points);
-        globalRanking=globalRanking.slice(0,1000);
-        localStorage.setItem('globalRanking',JSON.stringify(globalRanking));
-        return globalRanking;
-    }catch(e){
-        return[];
-    }
-}
-
-function displayGlobalRanking(containerId,myRankId){
-    const globalRanking=saveToGlobalRanking(totalPoints);
-    const myRank=globalRanking.findIndex(entry=>entry.id===playerId)+1;
-    
-    $(containerId.replace('#','')).style.display="block";
-    const rankingList=$(containerId.replace('#','')+'List');
-    rankingList.innerHTML="";
-    
-    // トップ3を表示
-    const medals=["🥇","🥈","🥉"];
-    for(let i=0;i<Math.min(3,globalRanking.length);i++){
-        const rankDiv=document.createElement("div");
-        rankDiv.className="global-ranking-item";
-        if(globalRanking[i].id===playerId)rankDiv.classList.add("my-rank");
-        
-        rankDiv.innerHTML=`
-            <span><span class="rank-medal">${medals[i]}</span>${i+1}位</span>
-            <span>ID: ${globalRanking[i].id}</span>
-            <span>${globalRanking[i].points}P</span>
-        `;
-        rankingList.appendChild(rankDiv);
-    }
-    
-    // 自分の順位を表示
-    const myRankDiv=$(myRankId.replace('#',''));
-    myRankDiv.innerHTML=`
-        <div class="global-ranking-item my-rank">
-            <span><strong>${myRank}位</strong></span>
-            <span><strong>ID: ${playerId}</strong></span>
-            <span><strong>${totalPoints}P</strong></span>
-        </div>
-    `;
-}
-
 // 隠しステージの厳格な制御
 function enableHiddenStage(){hiddenStageAvailable=true;$("hiddenStageBtn").style.display="inline-block";$("hiddenModeInfo").style.display="block"}
 function disableHiddenStage(){hiddenStageAvailable=false;$("hiddenStageBtn").style.display="none";$("hiddenModeInfo").style.display="none"}
@@ -400,7 +299,15 @@ window.addEventListener('load',()=>{
 const R=(min,max)=>Math.floor(Math.random()*(max-min+1))+min;
 function formatTime(s){const m=Math.floor(s/60);return`${m.toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`}
 
-function calculateClearPoints(clearTime){if(clearTime<=300)return 2000;else if(clearTime<=600)return 1500;else if(clearTime<=900)return 1200;else if(clearTime<=1200)return 1000;else if(clearTime<=1800)return 800;else return 500}
+function calculateClearPoints(clearTime){
+    // まとめモードクリア時のポイントを10倍に変更
+    if(clearTime<=300)return 20000;
+    else if(clearTime<=600)return 15000;
+    else if(clearTime<=900)return 12000;
+    else if(clearTime<=1200)return 10000;
+    else if(clearTime<=1800)return 8000;
+    else return 5000;
+}
 
 // 得点計算関数を修正：練習モードは選べるモードの3倍
 function calculateLevelPoints(level){
@@ -422,10 +329,6 @@ function startTimer(){if(state.mode==='summary'||state.mode==='hidden'){state.st
 function updateTimer(){if(state.startTime){const elapsed=Math.floor((Date.now()-state.startTime)/1000);$("timer").textContent=formatTime(elapsed)}}
 function stopTimer(){if(state.timerInterval){clearInterval(state.timerInterval);state.timerInterval=null}}
 function getElapsedTime(){return state.startTime?Math.floor((Date.now()-state.startTime)/1000):0}
-
-function saveRanking(time){try{let rankings=JSON.parse(localStorage.getItem('decimalQuestRankings')||'[]');rankings.push({time,date:new Date().toISOString(),points:calculateClearPoints(time)});rankings.sort((a,b)=>a.time-b.time);rankings=rankings.slice(0,100);localStorage.setItem('decimalQuestRankings',JSON.stringify(rankings));return rankings}catch(e){return[]}}
-
-function displayRanking(currentTime){const rankings=saveRanking(currentTime);const currentRank=rankings.findIndex(r=>r.time===currentTime)+1;$("rankingDisplay").style.display="block";const rankingList=$("rankingList");rankingList.innerHTML="";const medals=["🥇","🥈","🥉"];for(let i=0;i<Math.min(3,rankings.length);i++){const rankDiv=document.createElement("div");rankDiv.className="ranking-item top3";rankDiv.innerHTML=`<span><span class="rank-medal">${medals[i]}</span>${i+1}位</span><span>${formatTime(rankings[i].time)}</span><span>${rankings[i].points}P</span>`;rankingList.appendChild(rankDiv)}const myRankingItem=$("myRankingItem");myRankingItem.innerHTML=`<div class="ranking-item current"><span><strong>あなたの順位: ${currentRank}位</strong></span><span><strong>${formatTime(currentTime)}</strong></span><span><strong>${calculateClearPoints(currentTime)}P</strong></span></div>`;const earnedPoints=calculateClearPoints(currentTime);$("pointsEarned").style.display="block";$("earnedPoints").textContent=earnedPoints;addPoints(earnedPoints)}
 
 function createFireworks(){const celebration=$("celebration");celebration.innerHTML="";for(let i=0;i<15;i++){setTimeout(()=>{const firework=document.createElement("div");firework.className="firework";firework.style.left=Math.random()*window.innerWidth+"px";firework.style.top=Math.random()*window.innerHeight+"px";firework.style.background=`radial-gradient(circle, hsl(${Math.random()*360}, 100%, 50%), hsl(${Math.random()*360}, 100%, 70%))`;celebration.appendChild(firework);setTimeout(()=>firework.remove(),2000)},i*100)}for(let i=0;i<30;i++){setTimeout(()=>{const sparkle=document.createElement("div");sparkle.className="sparkle";sparkle.style.left=Math.random()*window.innerWidth+"px";sparkle.style.top=Math.random()*window.innerHeight+"px";celebration.appendChild(sparkle);setTimeout(()=>sparkle.remove(),1500)},i*50)}}
 
@@ -916,175 +819,158 @@ function submitNormal(){
     checkAnswer(ans,state.prob.a,state.unit);
 }
 
+
 function submitPosition(){
     const ones=$("ones").value||"0";
     const tenths=$("tenths").value||"0";
     const hundredths=$("hundredths").value||"0";
     const thousandths=$("thousandths").value||"0";
-    const userAns=`${ones},${tenths},${hundredths},${thousandths}`;
-    checkAnswer(userAns,state.prob.a,"");
+    const ans=`${ones},${tenths},${hundredths},${thousandths}`;
+    checkAnswer(ans,state.prob.a,"");
 }
 
 function submitMulti(){
     const multi1=$("multi1").value||"0";
     const multi2=$("multi2").value||"0";
     const multi3=$("multi3").value||"0";
-    const userAns=`${multi1},${multi2},${multi3}`;
-    checkAnswer(userAns,state.prob.a,"");
+    const ans=`${multi1},${multi2},${multi3}`;
+    checkAnswer(ans,state.prob.a,"");
 }
 
-function checkAnswer(userAns,correctAns,unit){
-    const isCorrect=userAns===correctAns;
-    handleAnswer(isCorrect,correctAns+unit);
-}
-
-function handleAnswer(isCorrect,correctAns){
+function checkAnswer(ans,correct,unit){
+    const isCorrect=ans.toString().toLowerCase()===correct.toString().toLowerCase();
+    
     if(isCorrect){
         state.score++;
-        const points=calculateCorrectPoints(state.level);
-        addPoints(points);
-        
         if(state.mode==='practice')state.lvCount++;
-        else if(state.mode==='select')state.selectQCount++;
+        else if(state.mode==='summary'){state.qNum++;state.totalQ++;}
         else if(state.mode==='hidden')state.hiddenQ++;
-        else{
-            state.qNum++;
-            state.totalQ++;
-        }
+        else if(state.mode==='select')state.selectQCount++;
         
+        addPoints(calculateCorrectPoints(state.level));
         animate("correct");
-        setTimeout(nextQ,2000);
+        setTimeout(nextQ,1500);
     }else{
-        $("wrong").style.display="block";
-        if(state.prob.type!=='choice'){
-            $("correctAnswer").style.display="block";
-            $("correctText").textContent=correctAns;
-        }
-        
-        if(state.mode==='practice'){
-            state.lvCount=0;
-            $("practiceMsg").style.display="block";
-        }else if(state.mode==='select'){
-            state.selectQCount=Math.max(0,state.selectQCount-1);
-            $("selectMsg").style.display="block";
-            $("backToSelectBtn").style.display="inline-block";
-        }else{
-            if(state.mode==='hidden')disableHiddenStage();
-            showGameOver();
-            return;
-        }
-        
-        animate("wrong");
+        showWrong(correct,unit);
     }
+}
+
+function showWrong(correct,unit){
+    $("wrongMsg").textContent="まちがいです。";
+    $("correctText").textContent=correct+(unit?" "+unit:"");
+    $("correctAnswer").style.display="block";
+    
+    if(state.mode==='practice'){
+        state.lvCount=0;
+        $("practiceMsg").style.display="block";
+        $("selectMsg").style.display="none";
+        $("backToSelectBtn").style.display="none";
+    }else if(state.mode==='select'){
+        $("practiceMsg").style.display="none";
+        $("selectMsg").style.display="block";
+        $("backToSelectBtn").style.display="inline-block";
+    }else{
+        showGameOver();
+        return;
+    }
+    
+    $("wrong").style.display="block";
+    animate("wrong");
 }
 
 function showError(msg){
-    $("wrongMsg").textContent=msg;
-    $("wrong").style.display="block";
-    $("correctAnswer").style.display="none";
-    $("practiceMsg").style.display="none";
-    $("selectMsg").style.display="none";
-    $("backToSelectBtn").style.display="none";
+    const errorDiv=document.createElement('div');
+    errorDiv.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#ffebee;color:#d32f2f;padding:20px;border-radius:10px;border:2px solid #f44336;z-index:1000;font-size:18px;font-weight:bold;">${msg}</div>`;
+    document.body.appendChild(errorDiv);
+    setTimeout(()=>errorDiv.remove(),2000);
 }
 
-function retry(){
-    $("wrong").style.display="none";
-    clearInputs();
-    if(state.prob?.type==='choice'){
-        state.selectedChoice=null;
-        document.querySelectorAll('.choice-btn').forEach(btn=>btn.classList.remove('selected'));
-    }
-    setFocus();
-}
-
-function next(){
-    nextQ();
-}
+function retry(){nextQ()}
+function next(){nextQ()}
 
 function showGameOver(){
     stopTimer();
-    const progressPoints=state.level*20+state.score*5;
-    addPoints(progressPoints);
-    $("gameoverPoints").style.display="block";
-    $("gameoverPointsValue").textContent=progressPoints;
-    displayGlobalRanking('#globalRankingGameover','#myGlobalRankGameover');
-    
     $("game").style.display="none";
     $("gameover").style.display="block";
-    $("finalLv").textContent=state.mode==='hidden'?"隠し":state.level;
+    $("finalLv").textContent=state.level;
     $("finalScore1").textContent=state.score;
     
     if(state.mode==='summary'||state.mode==='hidden'){
-        const elapsedTime=getElapsedTime();
+        const elapsed=getElapsedTime();
         $("finalTime").style.display="block";
-        $("finalTimeValue").textContent=formatTime(elapsedTime);
+        $("finalTimeValue").textContent=formatTime(elapsed);
     }
+    
+    // ゲームオーバー時は現在のポイントのみ表示
+    $("currentPointsGameover").style.display="block";
+    $("currentPointsGameoverValue").textContent=totalPoints;
+    $("gameoverPoints").style.display="none";
 }
 
 function showClear(){
     stopTimer();
-    createFireworks();
     $("game").style.display="none";
     $("clear").style.display="block";
     $("finalScore2").textContent=state.score;
     
+    const elapsed=getElapsedTime();
+    $("clearTimeValue").textContent=formatTime(elapsed);
+    
     if(state.mode==='summary'){
+        // まとめモードクリア時のポイントを10倍に変更
+        const clearPoints=calculateClearPoints(elapsed);
+        addPoints(clearPoints);
         enableHiddenStage();
         $("hiddenStageUnlock").style.display="block";
-        const elapsedTime=getElapsedTime();
-        $("clearTimeValue").textContent=formatTime(elapsedTime);
-        displayRanking(elapsedTime);
     }
     
-    displayGlobalRanking('#globalRankingClear','#myGlobalRankClear');
+    // クリア時は現在のポイントのみ表示
+    $("currentPointsClear").style.display="block";
+    $("currentPointsClearValue").textContent=totalPoints;
+    $("pointsEarned").style.display="none";
+    
+    createFireworks();
 }
 
 function showHiddenClear(){
     stopTimer();
-    createMasterFireworks();
-    disableHiddenStage();
-    
-    const hiddenPoints=3000;
-    addPoints(hiddenPoints);
-    $("hiddenPointsEarned").style.display="block";
-    $("hiddenEarnedPoints").textContent=hiddenPoints;
-    
-    displayGlobalRanking('#globalRankingHidden','#myGlobalRankHidden');
-    unlockTitle('decimalMaster');
-    
     $("game").style.display="none";
     $("hiddenClear").style.display="block";
     $("hiddenFinalScore").textContent=state.score;
-}
-
-// 得点計算関数を修正：練習モードは選べるモードの3倍
-function calculateLevelPoints(level){
-    if(state.mode === 'summary') return level*50;
-    else if(state.mode === 'practice') return Math.floor(level*15); // 選べるモードの3倍（5*3=15）
-    else return Math.floor(level*5); // 選べるモード
-}
-
-function calculateCorrectPoints(level){
-    if(state.mode === 'summary') return Math.min(level*10,100);
-    else if(state.mode === 'practice') return Math.floor(Math.min(level*3,30)); // 選べるモードの3倍（1*3=3）
-    else return Math.floor(Math.min(level*1,10)); // 選べるモード
-}
-
-document.addEventListener('keydown',e=>{
-    if(e.key==='Enter'&&e.target.tagName==='INPUT'){
-        e.preventDefault();
-        if(state.prob?.type==='position')submitPosition();
-        else if(state.prob?.type==='multi')submitMulti();
-        else submitNormal();
-    }
     
-    if(state.prob?.type==='choice'){
-        if(e.key==='1'||e.key==='ArrowLeft'){
-            selectChoice('left');
-        }else if(e.key==='2'||e.key==='ArrowRight'){
-            selectChoice('right');
+    const hiddenPoints=5000;
+    addPoints(hiddenPoints);
+    unlockTitle('decimalMaster');
+    
+    // 隠しステージクリア時も現在のポイントのみ表示
+    $("currentPointsHidden").style.display="block";
+    $("currentPointsHiddenValue").textContent=totalPoints;
+    $("hiddenPointsEarned").style.display="none";
+    
+    createMasterFireworks();
+    disableHiddenStage();
+}
+
+// キーボードイベント
+document.addEventListener('keydown',e=>{
+    if(e.key==='Enter'){
+        if($("game").style.display!=="none"){
+            if(state.prob?.type==='position')submitPosition();
+            else if(state.prob?.type==='multi')submitMulti();
+            else if(state.prob?.type!=='choice')submitNormal();
         }
+        if($("wrong").style.display!=="none")retry();
     }
+});
+
+// 初期化
+window.addEventListener('load',()=>{
+    try{
+        const savedHiddenStage=localStorage.getItem('hiddenStageAvailable');
+        if(savedHiddenStage==='true'){
+            enableHiddenStage();
+        }
+    }catch(e){}
 });
 </script>
 </body>
