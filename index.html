@@ -105,6 +105,70 @@ input:focus{border-color:#2196f3;outline:none;box-shadow:0 0 5px rgba(33,150,243
 .chart-canvas{width:100%!important;height:200px!important}
 .level-clear-screen{background:linear-gradient(45deg,#ff9a9e,#fecfef,#a8e6cf,#dcedc1);animation:rainbow 3s infinite;padding:40px;border-radius:20px;margin:20px}
 .level-clear-screen.paused{animation-play-state:paused}
+
+/* 手書きスペース用のスタイル */
+.handwriting-section {
+  background: white;
+  border: 2px solid #2196f3;
+  border-radius: 10px;
+  padding: 15px;
+  margin: 15px 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,.1);
+}
+
+.handwriting-section h3 {
+  margin: 0 0 10px 0;
+  color: #2196f3;
+  font-size: 16px;
+}
+
+#drawCanvas {
+  border: 2px dashed #e0e0e0;
+  border-radius: 8px;
+  background: #fafafa;
+  cursor: crosshair;
+  touch-action: none;
+  display: block;
+  margin: 0 auto;
+}
+
+.canvas-controls {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.canvas-btn {
+  background: #ff9800;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.3s;
+}
+
+.canvas-btn:hover {
+  background: #f57c00;
+}
+
+.canvas-btn.toggle {
+  background: #2196f3;
+}
+
+.canvas-btn.toggle:hover {
+  background: #1976d2;
+}
+
+.handwriting-notice {
+  font-size: 12px;
+  color: #666;
+  margin-top: 8px;
+  font-style: italic;
+}
 </style>
 </head>
 <body>
@@ -163,6 +227,17 @@ input:focus{border-color:#2196f3;outline:none;box-shadow:0 0 5px rgba(33,150,243
 <div class="level-indicator" id="levelIndicator"></div>
 <div class="monster" id="monster">🎯</div>
 <div class="question" id="q"></div>
+
+<!-- 手書きスペースの追加 -->
+<div id="handwritingSpace" class="handwriting-section" style="display:none">
+  <h3>✏️ 手書き計算スペース</h3>
+  <canvas id="drawCanvas" width="600" height="300"></canvas>
+  <div class="canvas-controls">
+    <button class="canvas-btn" onclick="clearHandwriting()">🗑️ クリア</button>
+    <button class="canvas-btn toggle" onclick="toggleHandwriting()">📝 表示/非表示</button>
+  </div>
+  <div class="handwriting-notice">マウスや指で自由に計算式や図を書けます</div>
+</div>
 
 <div id="answerSections" class="answer-sections">
 <div class="answer-section">
@@ -297,6 +372,11 @@ const monsters=["🎯","🌟","💎","🎨","🎪","🎭","🎵","🎸","🎲","
 const lvNames=["たんいへんかん","小数の仕組み","小数の位","小数の大小","小数 何倍か","小数 何分の一か","小数のこうせい","小数の足し算","小数のひき算","小数文章問題","小数の色々な見方"];
 let totalPoints=0,hiddenStageAvailable=false,playerId='',selectModeCleared=new Set();
 
+// 手書き機能の変数
+let handwritingCanvas, handwritingCtx;
+let isDrawing = false;
+let handwritingVisible = false;
+
 // プレイヤーIDの生成と管理
 function generatePlayerId(){
     const now=new Date();
@@ -319,6 +399,104 @@ function initializePlayerId(){
     }catch(e){
         playerId=generatePlayerId();
     }
+}
+
+// 手書き機能の初期化
+function initHandwriting() {
+    handwritingCanvas = document.getElementById('drawCanvas');
+    if (!handwritingCanvas) return;
+    
+    handwritingCtx = handwritingCanvas.getContext('2d');
+    
+    // 描画設定
+    handwritingCtx.lineWidth = 2;
+    handwritingCtx.lineCap = 'round';
+    handwritingCtx.lineJoin = 'round';
+    handwritingCtx.strokeStyle = '#2196f3';
+    
+    setupHandwritingEvents();
+}
+
+// イベントリスナーの設定
+function setupHandwritingEvents() {
+    if (!handwritingCanvas) return;
+    
+    // マウスイベント
+    handwritingCanvas.addEventListener('mousedown', startDrawing);
+    handwritingCanvas.addEventListener('mousemove', draw);
+    handwritingCanvas.addEventListener('mouseup', stopDrawing);
+    handwritingCanvas.addEventListener('mouseout', stopDrawing);
+    
+    // タッチイベント（スマホ・タブレット対応）
+    handwritingCanvas.addEventListener('touchstart', handleTouch);
+    handwritingCanvas.addEventListener('touchmove', handleTouch);
+    handwritingCanvas.addEventListener('touchend', stopDrawing);
+    handwritingCanvas.addEventListener('touchcancel', stopDrawing);
+}
+
+function getDrawingPosition(e) {
+    if (!handwritingCanvas) return {x: 0, y: 0};
+    
+    const rect = handwritingCanvas.getBoundingClientRect();
+    if (e.touches) {
+        return {
+            x: e.touches[0].clientX - rect.left,
+            y: e.touches[0].clientY - rect.top
+        };
+    }
+    return {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+    };
+}
+
+function startDrawing(e) {
+    isDrawing = true;
+    const pos = getDrawingPosition(e);
+    if (handwritingCtx) {
+        handwritingCtx.beginPath();
+        handwritingCtx.moveTo(pos.x, pos.y);
+    }
+}
+
+function draw(e) {
+    if (!isDrawing || !handwritingCtx) return;
+    
+    const pos = getDrawingPosition(e);
+    handwritingCtx.lineTo(pos.x, pos.y);
+    handwritingCtx.stroke();
+}
+
+function stopDrawing() {
+    isDrawing = false;
+    if (handwritingCtx) {
+        handwritingCtx.beginPath();
+    }
+}
+
+function handleTouch(e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const mouseEvent = new MouseEvent(e.type === 'touchstart' ? 'mousedown' : 
+                                     e.type === 'touchmove' ? 'mousemove' : 'mouseup', {
+        clientX: touch.clientX,
+        clientY: touch.clientY
+    });
+    if (handwritingCanvas) {
+        handwritingCanvas.dispatchEvent(mouseEvent);
+    }
+}
+
+function clearHandwriting() {
+    if (handwritingCtx && handwritingCanvas) {
+        handwritingCtx.clearRect(0, 0, handwritingCanvas.width, handwritingCanvas.height);
+    }
+}
+
+function toggleHandwriting() {
+    const handwritingSpace = document.getElementById('handwritingSpace');
+    handwritingVisible = !handwritingVisible;
+    handwritingSpace.style.display = handwritingVisible ? 'block' : 'none';
 }
 
 // 選べるモードのクリア状況を管理
@@ -671,7 +849,7 @@ function generateProblem(level){
                 type:'position'
             };
 
-        case 4:
+                case 4:
             const patterns=[
                 ()=>{
                     const base=R(1,20);
@@ -994,6 +1172,11 @@ function updateLevelIndicator(){
 }
 
 function nextQ(){
+    // 手書きスペースを自動表示
+    if (!handwritingVisible) {
+        toggleHandwriting();
+    }
+    
     if(state.mode==='hidden'){
         if(state.hiddenQ>=10){
             showHiddenClear();
@@ -1013,7 +1196,6 @@ function nextQ(){
             updateLevelIndicator();
         }
     }else if(state.mode==='select'){
-        // 選べるモードで10問連続正解でクリア
         if(state.selectQCount>=10){
             showLevelClear();
             return;
@@ -1137,6 +1319,12 @@ function checkAnswer(ans,correct,unit){
         
         addPoints(calculateCorrectPoints(state.level));
         animate("correct");
+        
+        // 正解時に手書きスペースをクリア
+        setTimeout(() => {
+            clearHandwriting();
+        }, 1000);
+        
         setTimeout(nextQ,1500);
     }else{
         showWrong(correct,unit);
@@ -1154,7 +1342,6 @@ function showWrong(correct,unit){
         $("selectMsg").style.display="none";
         $("backToSelectBtn").style.display="none";
     }else if(state.mode==='select'){
-        // 選べるモードで間違えたらカウント0に戻る
         state.selectQCount=0;
         $("practiceMsg").style.display="none";
         $("selectMsg").style.display="block";
@@ -1178,34 +1365,12 @@ function showError(msg){
 function retry(){nextQ()}
 function next(){nextQ()}
 
-// アニメーション停止機能（3秒後に停止）
-function pauseAnimationAfterDelay(elementId, delay = 3000) {
-    setTimeout(() => {
-        const element = document.getElementById(elementId);
-        if (element) {
-            element.classList.add('paused');
-        }
-        // 背景アニメーションも停止
-        const bgElement = element?.querySelector('[style*="animation"]');
-        if (bgElement) {
-            bgElement.style.animationPlayState = 'paused';
-        }
-        // マスターセレブレーション要素も停止
-        const masterElement = element?.querySelector('.master-celebration');
-        if (masterElement) {
-            masterElement.classList.add('paused');
-        }
-    }, delay);
-}
-
-// 選べるモード用のレベルクリア画面
 function showLevelClear(){
     $("game").style.display="none";
     $("levelClear").style.display="block";
     $("clearedLevel").textContent=state.level;
     $("levelClearScore").textContent=state.score;
     
-    // レベルクリア時のボーナスポイント
     const clearBonus=state.level*100;
     addPoints(clearBonus);
     markLevelCleared(state.level);
@@ -1213,12 +1378,8 @@ function showLevelClear(){
     $("levelClearPointsValue").textContent=clearBonus;
     $("currentPointsLevelClearValue").textContent=totalPoints;
     
-    // 折れ線グラフを表示
     setTimeout(()=>createPointsChart('levelClearPointsChart'),100);
-    
-    // アニメーションを3秒後に停止
     pauseAnimationAfterDelay('levelClear');
-    
     createFireworks();
 }
 
@@ -1235,12 +1396,10 @@ function showGameOver(){
         $("finalTimeValue").textContent=formatTime(elapsed);
     }
     
-    // ゲームオーバー時にポイント表示と折れ線グラフを表示
     $("currentPointsGameover").style.display="block";
     $("currentPointsGameoverValue").textContent=totalPoints;
     $("gameoverPoints").style.display="none";
     
-    // 折れ線グラフを表示
     setTimeout(()=>createPointsChart('pointsChart'),100);
 }
 
@@ -1264,12 +1423,8 @@ function showClear(){
     $("currentPointsClearValue").textContent=totalPoints;
     $("pointsEarned").style.display="none";
     
-    // 折れ線グラフを表示
     setTimeout(()=>createPointsChart('clearPointsChart'),100);
-    
-    // アニメーションを3秒後に停止
     pauseAnimationAfterDelay('clear');
-    
     createFireworks();
 }
 
@@ -1287,17 +1442,12 @@ function showHiddenClear(){
     $("currentPointsHiddenValue").textContent=totalPoints;
     $("hiddenPointsEarned").style.display="none";
     
-    // 折れ線グラフを表示
     setTimeout(()=>createPointsChart('hiddenPointsChart'),100);
-    
-    // アニメーションを3秒後に停止
     pauseAnimationAfterDelay('hiddenClear');
-    
     createMasterFireworks();
     disableHiddenStage();
 }
 
-// キーボードイベント
 document.addEventListener('keydown',e=>{
     if(e.key==='Enter'){
         if($("game").style.display!=="none"){
@@ -1309,10 +1459,10 @@ document.addEventListener('keydown',e=>{
     }
 });
 
-// 初期化
 window.addEventListener('load',()=>{
     initializePlayerId();
     loadSelectModeCleared();
+    initHandwriting(); // 手書き機能を初期化
     $("playerIdDisplay").style.display="block";
     $("playerId").textContent=playerId;
     if(totalPoints>0){
@@ -1331,3 +1481,165 @@ window.addEventListener('load',()=>{
 </script>
 </body>
 </html>
+
+
+
+
+
+<!-- 手書き計算スペース（常時表示） -->
+<div id="handwritingSpace" style="margin-top:40px;padding:20px;background:#f0f8ff;border-radius:15px;border:3px solid #2196f3">
+<div class="info">
+<h2 style="color:#2196f3;margin:0 0 15px 0">📝 手書き計算スペース</h2>
+<p style="margin:0 0 15px 0;color:#666">マウスや指で自由に計算式や図を書けます</p>
+</div>
+<div style="background:white;border-radius:10px;padding:20px;border:2px solid #2196f3">
+<canvas id="drawArea" width="800" height="500" style="border:2px solid #2196f3;border-radius:8px;background:#fff;touch-action:none;display:block;margin:0 auto;cursor:crosshair"></canvas>
+<div style="margin-top:15px;text-align:center">
+<button onclick="clearDrawCanvas()" style="background:#ff9800;color:white;border:none;padding:10px 20px;border-radius:6px;margin:5px;cursor:pointer;font-size:14px">🗑️ クリア</button>
+</div>
+<div style="font-size:14px;color:#666;margin-top:15px;text-align:center;background:#f8f9fa;padding:10px;border-radius:6px">
+💡 ヒント: 筆算や図を描いて問題を解いてみましょう！小数の位取りや計算過程を書くと理解が深まります。
+</div>
+</div>
+</div>
+
+<script>
+// 手書き描画機能の変数（名前を変更して競合を回避）
+let drawCanvas, drawCtx, isDrawingNow = false;
+
+// 手書きスペースの初期化
+function initDrawingSpace() {
+  drawCanvas = document.getElementById('drawArea');
+  if (!drawCanvas) {
+    console.log('Canvas element not found');
+    return;
+  }
+  
+  drawCtx = drawCanvas.getContext('2d');
+  if (!drawCtx) {
+    console.log('Canvas context not available');
+    return;
+  }
+  
+  // Canvas設定を明示的に設定
+  drawCtx.lineCap = 'round';
+  drawCtx.lineJoin = 'round';
+  drawCtx.lineWidth = 2;
+  drawCtx.strokeStyle = '#2196f3';
+  
+  console.log('Drawing space initialized');
+  setupDrawingEvents();
+}
+
+function getDrawPos(e) {
+  const rect = drawCanvas.getBoundingClientRect();
+  
+  if (e.touches && e.touches.length > 0) {
+    return {
+      x: e.touches[0].clientX - rect.left,
+      y: e.touches[0].clientY - rect.top
+    };
+  } else {
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    };
+  }
+}
+
+function setupDrawingEvents() {
+  if (!drawCanvas || !drawCtx) {
+    console.log('Canvas or context not available for event setup');
+    return;
+  }
+  
+  console.log('Setting up drawing events');
+  
+  // マウス操作
+  drawCanvas.addEventListener('mousedown', function(e) {
+    console.log('Mouse down');
+    isDrawingNow = true;
+    const pos = getDrawPos(e);
+    drawCtx.beginPath();
+    drawCtx.moveTo(pos.x, pos.y);
+    e.preventDefault();
+  });
+  
+  drawCanvas.addEventListener('mousemove', function(e) {
+    if (!isDrawingNow) return;
+    console.log('Mouse move - drawing');
+    const pos = getDrawPos(e);
+    drawCtx.lineTo(pos.x, pos.y);
+    drawCtx.stroke();
+    e.preventDefault();
+  });
+  
+  drawCanvas.addEventListener('mouseup', function(e) {
+    console.log('Mouse up');
+    isDrawingNow = false;
+    drawCtx.beginPath();
+    e.preventDefault();
+  });
+  
+  drawCanvas.addEventListener('mouseleave', function(e) {
+    isDrawingNow = false;
+    drawCtx.beginPath();
+  });
+
+  // タッチ操作（スマホ・タブレット対応）
+  drawCanvas.addEventListener('touchstart', function(e) {
+    console.log('Touch start');
+    e.preventDefault();
+    isDrawingNow = true;
+    const pos = getDrawPos(e);
+    drawCtx.beginPath();
+    drawCtx.moveTo(pos.x, pos.y);
+  }, { passive: false });
+  
+  drawCanvas.addEventListener('touchmove', function(e) {
+    if (!isDrawingNow) return;
+    console.log('Touch move - drawing');
+    e.preventDefault();
+    const pos = getDrawPos(e);
+    drawCtx.lineTo(pos.x, pos.y);
+    drawCtx.stroke();
+  }, { passive: false });
+  
+  drawCanvas.addEventListener('touchend', function(e) {
+    console.log('Touch end');
+    e.preventDefault();
+    isDrawingNow = false;
+    drawCtx.beginPath();
+  }, { passive: false });
+  
+  drawCanvas.addEventListener('touchcancel', function(e) {
+    e.preventDefault();
+    isDrawingNow = false;
+    drawCtx.beginPath();
+  }, { passive: false });
+}
+
+function clearDrawCanvas() {
+  if (!drawCtx || !drawCanvas) {
+    console.log('Canvas or context not available for clearing');
+    return;
+  }
+  console.log('Clearing canvas');
+  drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+}
+
+// ページ読み込み時に手書きスペースを初期化
+window.addEventListener('load', function() {
+  console.log('Page loaded, initializing drawing space');
+  // 既存の初期化処理の後に手書きスペースを初期化
+  setTimeout(function() {
+    initDrawingSpace();
+  }, 1000); // 1秒後に初期化
+});
+
+// 手動初期化用の関数（デバッグ用）
+function manualInitDraw() {
+  console.log('Manual initialization');
+  initDrawingSpace();
+}
+</script>
