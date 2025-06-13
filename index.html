@@ -15,8 +15,9 @@ body{font-family:Arial;text-align:center;background:#f0f8ff;margin:0;padding:20p
 @keyframes correct{0%{transform:scale(1);color:#333}25%{transform:scale(1.3) rotate(10deg);color:#0f0;filter:drop-shadow(0 0 15px #0f0)}50%{transform:scale(1.5) rotate(-10deg);color:#00ff00;filter:drop-shadow(0 0 25px #00ff00)}75%{transform:scale(1.3) rotate(5deg);color:#32cd32;filter:drop-shadow(0 0 20px #32cd32)}100%{transform:scale(1);color:gold;filter:drop-shadow(0 0 10px gold)}}
 @keyframes wrong{0%{transform:scale(1)}25%{transform:scale(1.2)rotate(-10deg);color:#f00}50%{transform:scale(1.2)rotate(10deg);color:#f00}75%{transform:scale(1.2)rotate(-10deg);color:#f00}100%{transform:scale(1);color:#333}}
 .question{font-size:24px;margin:20px;padding:20px;background:white;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.1)}
-button{margin:10px;padding:12px 24px;font-size:16px;border:none;border-radius:8px;background:#4CAF50;color:white;cursor:pointer}
+button{margin:10px;padding:12px 24px;font-size:16px;border:none;border-radius:8px;background:#4CAF50;color:white;cursor:pointer;transition:all 0.3s}
 button:hover{background:#45a049}
+button:disabled{background:#ccc;cursor:not-allowed;opacity:0.6}
 .mode-btn{background:#2196f3;padding:15px 30px;font-size:18px;margin:20px}
 .mode-btn:hover{background:#1976d2}
 .mode-btn.practice{background:#ff9800}
@@ -28,6 +29,7 @@ button:hover{background:#45a049}
 @keyframes hiddenPulse{0%,100%{transform:scale(1);box-shadow:0 0 10px #ff6b6b}50%{transform:scale(1.05);box-shadow:0 0 20px #ff6b6b}}
 input{font-size:18px;padding:10px;border:2px solid #ddd;border-radius:5px;margin:10px}
 input:focus{border-color:#2196f3;outline:none;box-shadow:0 0 5px rgba(33,150,243,.3)}
+input:disabled{background:#f5f5f5;cursor:not-allowed}
 .status{margin:15px 0;font-size:18px}
 .progress{background:#e0e0e0;border-radius:10px;margin:15px 0;height:20px;overflow:hidden}
 .progress-bar{height:100%;transition:width .3s}
@@ -53,11 +55,13 @@ input:focus{border-color:#2196f3;outline:none;box-shadow:0 0 5px rgba(33,150,243
 .normal-input{display:flex;flex-direction:column;align-items:center;gap:10px}
 .normal-input input{width:100px;text-align:center}
 .unit-display{font-size:14px;font-weight:bold;color:#666;margin-top:5px}
-.submit-btn{padding:12px 20px;font-size:16px;background:#4CAF50;color:white;border:none;border-radius:8px;cursor:pointer}
+.submit-btn{padding:12px 20px;font-size:16px;background:#4CAF50;color:white;border:none;border-radius:8px;cursor:pointer;transition:all 0.3s}
 .submit-btn:hover{background:#45a049}
+.submit-btn:disabled{background:#ccc;cursor:not-allowed;opacity:0.6}
 .choice-buttons{display:flex;justify-content:center;gap:20px;margin:20px 0}
-.choice-btn{padding:15px 30px;font-size:20px;background:#2196f3;color:white;border:none;border-radius:8px;cursor:pointer;min-width:120px}
+.choice-btn{padding:15px 30px;font-size:20px;background:#2196f3;color:white;border:none;border-radius:8px;cursor:pointer;min-width:120px;transition:all 0.3s}
 .choice-btn:hover{background:#1976d2}
+.choice-btn:disabled{background:#ccc;cursor:not-allowed;opacity:0.6}
 .choice-btn.selected{background:#ff9800;transform:scale(1.05)}
 .level-indicator{display:flex;justify-content:center;gap:8px;margin:15px 0;flex-wrap:wrap}
 .level-dot{width:25px;height:25px;border-radius:50%;background:#e0e0e0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold}
@@ -105,70 +109,8 @@ input:focus{border-color:#2196f3;outline:none;box-shadow:0 0 5px rgba(33,150,243
 .chart-canvas{width:100%!important;height:200px!important}
 .level-clear-screen{background:linear-gradient(45deg,#ff9a9e,#fecfef,#a8e6cf,#dcedc1);animation:rainbow 3s infinite;padding:40px;border-radius:20px;margin:20px}
 .level-clear-screen.paused{animation-play-state:paused}
-
-/* 手書きスペース用のスタイル */
-.handwriting-section {
-  background: white;
-  border: 2px solid #2196f3;
-  border-radius: 10px;
-  padding: 15px;
-  margin: 15px 0;
-  box-shadow: 0 2px 10px rgba(0,0,0,.1);
-}
-
-.handwriting-section h3 {
-  margin: 0 0 10px 0;
-  color: #2196f3;
-  font-size: 16px;
-}
-
-#drawCanvas {
-  border: 2px dashed #e0e0e0;
-  border-radius: 8px;
-  background: #fafafa;
-  cursor: crosshair;
-  touch-action: none;
-  display: block;
-  margin: 0 auto;
-}
-
-.canvas-controls {
-  margin-top: 10px;
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.canvas-btn {
-  background: #ff9800;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background 0.3s;
-}
-
-.canvas-btn:hover {
-  background: #f57c00;
-}
-
-.canvas-btn.toggle {
-  background: #2196f3;
-}
-
-.canvas-btn.toggle:hover {
-  background: #1976d2;
-}
-
-.handwriting-notice {
-  font-size: 12px;
-  color: #666;
-  margin-top: 8px;
-  font-style: italic;
-}
+.processing-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.3);z-index:2000;display:flex;align-items:center;justify-content:center}
+.processing-message{background:white;padding:20px;border-radius:10px;border:2px solid #2196f3;font-size:18px;font-weight:bold;color:#2196f3}
 </style>
 </head>
 <body>
@@ -227,8 +169,6 @@ input:focus{border-color:#2196f3;outline:none;box-shadow:0 0 5px rgba(33,150,243
 <div class="level-indicator" id="levelIndicator"></div>
 <div class="monster" id="monster">🎯</div>
 <div class="question" id="q"></div>
-
-
 
 <div id="answerSections" class="answer-sections">
 <div class="answer-section">
@@ -356,17 +296,176 @@ input:focus{border-color:#2196f3;outline:none;box-shadow:0 0 5px rgba(33,150,243
 
 <div id="celebration" class="correct-celebration"></div>
 
+<!-- 手書き計算スペース -->
+<div id="handwritingSpace" style="margin-top:40px;padding:20px;background:#f0f8ff;border-radius:15px;border:3px solid #2196f3">
+<div class="info">
+<h2 style="color:#2196f3;margin:0 0 15px 0">📝 手書き計算スペース</h2>
+<p style="margin:0 0 15px 0;color:#666">マウスや指で自由に計算式や図を書けます</p>
+</div>
+<div style="background:white;border-radius:10px;padding:20px;border:2px solid #2196f3">
+<div style="margin-bottom:15px;text-align:center">
+<button onclick="clearDrawCanvas()" style="background:#ff9800;color:white;border:none;padding:10px 20px;border-radius:6px;margin:5px;cursor:pointer;font-size:14px">🗑️ クリア</button>
+</div>
+<canvas id="drawArea" width="800" height="400" style="border:2px solid #2196f3;border-radius:8px;background:#fff;touch-action:none;display:block;margin:0 auto;cursor:crosshair;max-width:100%"></canvas>
+<div style="font-size:14px;color:#666;margin-top:15px;text-align:center;background:#f8f9fa;padding:10px;border-radius:6px">
+💡 ヒント: 筆算や図を描いて問題を解いてみましょう！小数の位取りや計算過程を書くと理解が深まります。
+</div>
+</div>
+</div>
+
+<!-- 処理中オーバーレイ -->
+<div id="processingOverlay" class="processing-overlay" style="display:none">
+<div class="processing-message">処理中...</div>
+</div>
+
 <script>
-const $=id=>document.getElementById(id)||{style:{},textContent:'',innerHTML:'',value:'',classList:{add:()=>{},remove:()=>{}},appendChild:()=>{},remove:()=>{},focus:()=>{}};
-let state={score:0,level:1,prob:null,unit:"",mode:"",lvCount:0,totalQ:0,qNum:0,completed:new Set(),selectedChoice:null,selectQCount:0,startTime:null,timerInterval:null,hiddenQ:0,sessionPoints:0};
+const $=id=>document.getElementById(id)||{style:{},textContent:'',innerHTML:'',value:'',classList:{add:()=>{},remove:()=>{}},appendChild:()=>{},remove:()=>{},focus:()=>{},disabled:false};
+let state={score:0,level:1,prob:null,unit:"",mode:"",lvCount:0,totalQ:0,qNum:0,completed:new Set(),selectedChoice:null,selectQCount:0,startTime:null,timerInterval:null,hiddenQ:0,sessionPoints:0,isProcessing:false,lastAnswerTime:0};
 const monsters=["🎯","🌟","💎","🎨","🎪","🎭","🎵","🎸","🎲","👑","🌈"];
 const lvNames=["たんいへんかん","小数の仕組み","小数の位","小数の大小","小数 何倍か","小数 何分の一か","小数のこうせい","小数の足し算","小数のひき算","小数文章問題","小数の色々な見方"];
 let totalPoints=0,hiddenStageAvailable=false,playerId='',selectModeCleared=new Set();
 
-// 手書き機能の変数
-let handwritingCanvas, handwritingCtx;
-let isDrawing = false;
-let handwritingVisible = false;
+// 手書き描画機能の変数
+let drawCanvas, drawCtx, isDrawingNow = false;
+
+// デバウンス関数
+function debounce(func, delay) {
+    let timeoutId;
+    return function(...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func.apply(this, args), delay);
+    };
+}
+
+// UI要素の無効化/有効化
+function disableAllInputs() {
+    const inputs = ['norm', 'ones', 'tenths', 'hundredths', 'thousandths', 'multi1', 'multi2', 'multi3'];
+    const buttons = document.querySelectorAll('.submit-btn, .choice-btn');
+    
+    inputs.forEach(id => {
+        const element = $(id);
+        if (element && element.disabled !== undefined) element.disabled = true;
+    });
+    
+    buttons.forEach(btn => btn.disabled = true);
+}
+
+function enableAllInputs() {
+    const inputs = ['norm', 'ones', 'tenths', 'hundredths', 'thousandths', 'multi1', 'multi2', 'multi3'];
+    const buttons = document.querySelectorAll('.submit-btn, .choice-btn');
+    
+    inputs.forEach(id => {
+        const element = $(id);
+        if (element && element.disabled !== undefined) element.disabled = false;
+    });
+    
+    buttons.forEach(btn => btn.disabled = false);
+}
+
+function showProcessingOverlay() {
+    $("processingOverlay").style.display = "flex";
+}
+
+function hideProcessingOverlay() {
+    $("processingOverlay").style.display = "none";
+}
+
+// 手書きスペースの初期化
+function initDrawingSpace() {
+    drawCanvas = $("drawArea");
+    if (!drawCanvas) return;
+    
+    drawCtx = drawCanvas.getContext('2d');
+    if (!drawCtx) return;
+    
+    drawCtx.lineCap = 'round';
+    drawCtx.lineJoin = 'round';
+    drawCtx.lineWidth = 2;
+    drawCtx.strokeStyle = '#2196f3';
+    
+    setupDrawingEvents();
+}
+
+function getDrawPos(e) {
+    if (!drawCanvas) return {x: 0, y: 0};
+    const rect = drawCanvas.getBoundingClientRect();
+    
+    if (e.touches && e.touches.length > 0) {
+        return {
+            x: (e.touches[0].clientX - rect.left) * (drawCanvas.width / rect.width),
+            y: (e.touches[0].clientY - rect.top) * (drawCanvas.height / rect.height)
+        };
+    } else {
+        return {
+            x: (e.clientX - rect.left) * (drawCanvas.width / rect.width),
+            y: (e.clientY - rect.top) * (drawCanvas.height / rect.height)
+        };
+    }
+}
+
+function setupDrawingEvents() {
+    if (!drawCanvas || !drawCtx) return;
+    
+    drawCanvas.addEventListener('mousedown', function(e) {
+        isDrawingNow = true;
+        const pos = getDrawPos(e);
+        drawCtx.beginPath();
+        drawCtx.moveTo(pos.x, pos.y);
+        e.preventDefault();
+    });
+    
+    drawCanvas.addEventListener('mousemove', function(e) {
+        if (!isDrawingNow) return;
+        const pos = getDrawPos(e);
+        drawCtx.lineTo(pos.x, pos.y);
+        drawCtx.stroke();
+        e.preventDefault();
+    });
+    
+    drawCanvas.addEventListener('mouseup', function(e) {
+        isDrawingNow = false;
+        drawCtx.beginPath();
+        e.preventDefault();
+    });
+    
+    drawCanvas.addEventListener('mouseleave', function(e) {
+        isDrawingNow = false;
+        drawCtx.beginPath();
+    });
+
+    drawCanvas.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        isDrawingNow = true;
+        const pos = getDrawPos(e);
+        drawCtx.beginPath();
+        drawCtx.moveTo(pos.x, pos.y);
+    }, { passive: false });
+    
+    drawCanvas.addEventListener('touchmove', function(e) {
+        if (!isDrawingNow) return;
+        e.preventDefault();
+        const pos = getDrawPos(e);
+        drawCtx.lineTo(pos.x, pos.y);
+        drawCtx.stroke();
+    }, { passive: false });
+    
+    drawCanvas.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        isDrawingNow = false;
+        drawCtx.beginPath();
+    }, { passive: false });
+    
+    drawCanvas.addEventListener('touchcancel', function(e) {
+        e.preventDefault();
+        isDrawingNow = false;
+        drawCtx.beginPath();
+    }, { passive: false });
+}
+
+function clearDrawCanvas() {
+    if (!drawCtx || !drawCanvas) return;
+    drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+}
 
 // プレイヤーIDの生成と管理
 function generatePlayerId(){
@@ -390,104 +489,6 @@ function initializePlayerId(){
     }catch(e){
         playerId=generatePlayerId();
     }
-}
-
-// 手書き機能の初期化
-function initHandwriting() {
-    handwritingCanvas = document.getElementById('drawCanvas');
-    if (!handwritingCanvas) return;
-    
-    handwritingCtx = handwritingCanvas.getContext('2d');
-    
-    // 描画設定
-    handwritingCtx.lineWidth = 2;
-    handwritingCtx.lineCap = 'round';
-    handwritingCtx.lineJoin = 'round';
-    handwritingCtx.strokeStyle = '#2196f3';
-    
-    setupHandwritingEvents();
-}
-
-// イベントリスナーの設定
-function setupHandwritingEvents() {
-    if (!handwritingCanvas) return;
-    
-    // マウスイベント
-    handwritingCanvas.addEventListener('mousedown', startDrawing);
-    handwritingCanvas.addEventListener('mousemove', draw);
-    handwritingCanvas.addEventListener('mouseup', stopDrawing);
-    handwritingCanvas.addEventListener('mouseout', stopDrawing);
-    
-    // タッチイベント（スマホ・タブレット対応）
-    handwritingCanvas.addEventListener('touchstart', handleTouch);
-    handwritingCanvas.addEventListener('touchmove', handleTouch);
-    handwritingCanvas.addEventListener('touchend', stopDrawing);
-    handwritingCanvas.addEventListener('touchcancel', stopDrawing);
-}
-
-function getDrawingPosition(e) {
-    if (!handwritingCanvas) return {x: 0, y: 0};
-    
-    const rect = handwritingCanvas.getBoundingClientRect();
-    if (e.touches) {
-        return {
-            x: e.touches[0].clientX - rect.left,
-            y: e.touches[0].clientY - rect.top
-        };
-    }
-    return {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
-    };
-}
-
-function startDrawing(e) {
-    isDrawing = true;
-    const pos = getDrawingPosition(e);
-    if (handwritingCtx) {
-        handwritingCtx.beginPath();
-        handwritingCtx.moveTo(pos.x, pos.y);
-    }
-}
-
-function draw(e) {
-    if (!isDrawing || !handwritingCtx) return;
-    
-    const pos = getDrawingPosition(e);
-    handwritingCtx.lineTo(pos.x, pos.y);
-    handwritingCtx.stroke();
-}
-
-function stopDrawing() {
-    isDrawing = false;
-    if (handwritingCtx) {
-        handwritingCtx.beginPath();
-    }
-}
-
-function handleTouch(e) {
-    e.preventDefault();
-    const touch = e.touches[0];
-    const mouseEvent = new MouseEvent(e.type === 'touchstart' ? 'mousedown' : 
-                                     e.type === 'touchmove' ? 'mousemove' : 'mouseup', {
-        clientX: touch.clientX,
-        clientY: touch.clientY
-    });
-    if (handwritingCanvas) {
-        handwritingCanvas.dispatchEvent(mouseEvent);
-    }
-}
-
-function clearHandwriting() {
-    if (handwritingCtx && handwritingCanvas) {
-        handwritingCtx.clearRect(0, 0, handwritingCanvas.width, handwritingCanvas.height);
-    }
-}
-
-function toggleHandwriting() {
-    const handwritingSpace = document.getElementById('handwritingSpace');
-    handwritingVisible = !handwritingVisible;
-    handwritingSpace.style.display = handwritingVisible ? 'block' : 'none';
 }
 
 // 選べるモードのクリア状況を管理
@@ -549,7 +550,6 @@ function getPointsHistory(){
     }
 }
 
-// ポイントの大きさに応じた適切なフォーマット関数
 function formatPointsValue(value) {
     if (value === 0) return '0P';
     if (value < 1000) return value + 'P';
@@ -559,7 +559,6 @@ function formatPointsValue(value) {
     return (value / 1000000).toFixed(1) + 'MP';
 }
 
-// 適切なY軸の最大値を計算する関数
 function calculateYAxisMax(maxValue) {
     if (maxValue === 0) return 100;
     if (maxValue <= 100) return Math.ceil(maxValue / 10) * 10;
@@ -569,7 +568,6 @@ function calculateYAxisMax(maxValue) {
     return Math.ceil(maxValue / 100000) * 100000;
 }
 
-// ステップサイズを計算する関数
 function calculateStepSize(maxValue) {
     if (maxValue <= 100) return 10;
     if (maxValue <= 500) return 50;
@@ -585,22 +583,19 @@ function createPointsChart(canvasId){
     const dates=Object.keys(history).sort();
     const points=dates.map(date=>history[date]);
     
-    // 累積ポイントを計算
     let cumulativePoints=0;
     const cumulativeData=points.map(point=>{
         cumulativePoints+=point;
         return cumulativePoints;
     });
     
-    const ctx=document.getElementById(canvasId);
+    const ctx=$(canvasId);
     if(!ctx)return;
     
-    // 既存のチャートがあれば破棄
     if(ctx.chart){
         ctx.chart.destroy();
     }
     
-    // データの最大値を取得
     const maxValue = Math.max(...cumulativeData, 0);
     const yAxisMax = calculateYAxisMax(maxValue);
     const stepSize = calculateStepSize(maxValue);
@@ -691,7 +686,6 @@ function createPointsChart(canvasId){
     });
 }
 
-// 隠しステージの厳格な制御
 function enableHiddenStage(){hiddenStageAvailable=true;$("hiddenStageBtn").style.display="inline-block";$("hiddenModeInfo").style.display="block"}
 function disableHiddenStage(){hiddenStageAvailable=false;$("hiddenStageBtn").style.display="none";$("hiddenModeInfo").style.display="none"}
 
@@ -749,19 +743,16 @@ function unlockTitle(titleKey){if(titles[titleKey]){titles[titleKey].unlocked=tr
 
 function showTitleUnlock(title){const titleDiv=document.createElement('div');titleDiv.innerHTML=`<div style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:2000;display:flex;align-items:center;justify-content:center"><div style="background:linear-gradient(45deg,#ffd700,#ffed4e);padding:40px;border-radius:20px;text-align:center;border:5px solid #ff6b6b;animation:titleGlow 2s infinite"><h1 style="color:#d32f2f;font-size:36px;margin:0;text-shadow:2px 2px 4px rgba(0,0,0,0.5)">🏆 称号獲得！ 🏆</h1><div style="font-size:48px;margin:20px 0">👑</div><h2 style="color:#1976d2;font-size:28px;margin:10px 0">${title.name}</h2><p style="color:#333;font-size:16px;margin:0">${title.description}</p><button onclick="this.parentElement.parentElement.remove()" style="margin-top:20px;padding:12px 24px;font-size:18px;background:#4CAF50;color:white;border:none;border-radius:8px;cursor:pointer">確認</button></div></div>`;document.body.appendChild(titleDiv)}
 
-// アニメーション停止機能（3秒後に停止）
 function pauseAnimationAfterDelay(elementId, delay = 3000) {
     setTimeout(() => {
-        const element = document.getElementById(elementId);
+        const element = $(elementId);
         if (element) {
             element.classList.add('paused');
         }
-        // 背景アニメーションも停止
         const bgElement = element?.querySelector('[style*="animation"]');
         if (bgElement) {
             bgElement.style.animationPlayState = 'paused';
         }
-        // マスターセレブレーション要素も停止
         const masterElement = element?.querySelector('.master-celebration');
         if (masterElement) {
             masterElement.classList.add('paused');
@@ -840,7 +831,7 @@ function generateProblem(level){
                 type:'position'
             };
 
-                case 4:
+        case 4:
             const patterns=[
                 ()=>{
                     const base=R(1,20);
@@ -924,7 +915,6 @@ function generateProblem(level){
         case 7:
             const unitType=R(0,2);
             let unit, unitText, count, decimal;
-
             if(unitType===0){
                 unit=0.1;
                 unitText="0.1";
@@ -1066,6 +1056,50 @@ function generateProblem(level){
     }
 }
 
+// 連打防止機能付きの回答処理関数
+let isProcessing = false;
+let lastAnswerTime = 0;
+
+function checkAnswer(ans, correct, unit) {
+    // 連打防止チェック
+    const now = Date.now();
+    if (isProcessing || (now - lastAnswerTime < 500)) {
+        return;
+    }
+    
+    isProcessing = true;
+    lastAnswerTime = now;
+    
+    const isCorrect = ans.toString().toLowerCase() === correct.toString().toLowerCase();
+    
+    if (isCorrect) {
+        state.score++;
+        if (state.mode === 'practice') state.lvCount++;
+        else if (state.mode === 'summary') { state.qNum++; state.totalQ++; }
+        else if (state.mode === 'hidden') state.hiddenQ++;
+        else if (state.mode === 'select') state.selectQCount++;
+        
+        addPoints(calculateCorrectPoints(state.level));
+        animate("correct");
+        
+        // 正解時に手書きスペースをクリア
+        setTimeout(() => {
+            clearDrawCanvas();
+        }, 1000);
+        
+        setTimeout(() => {
+            isProcessing = false;
+            nextQ();
+        }, 1500);
+    } else {
+        setTimeout(() => {
+            isProcessing = false;
+            showWrong(correct, unit);
+        }, 500);
+    }
+}
+
+// 残りの関数群
 function showLevelSelect(){$("start").style.display="none";$("levelSelect").style.display="block";updateLevelSelectDisplay()}
 function backToStart(){stopTimer();disableHiddenStage();["start","levelSelect","game","gameover","clear","hiddenClear","levelClear"].forEach(id=>$(id).style.display="none");$("start").style.display="block";$("timerDisplay").style.display="none"}
 function restart(){backToStart()}
@@ -1163,11 +1197,6 @@ function updateLevelIndicator(){
 }
 
 function nextQ(){
-    // 手書きスペースを自動表示
-    if (!handwritingVisible) {
-        toggleHandwriting();
-    }
-    
     if(state.mode==='hidden'){
         if(state.hiddenQ>=10){
             showHiddenClear();
@@ -1273,6 +1302,7 @@ function selectChoice(choice){
 }
 
 function submitNormal(){
+    if (isProcessing) return;
     const ans=$("norm").value.trim();
     if(!ans){
         showError("答えを入力してください");
@@ -1282,6 +1312,7 @@ function submitNormal(){
 }
 
 function submitPosition(){
+    if (isProcessing) return;
     const ones=$("ones").value||"0";
     const tenths=$("tenths").value||"0";
     const hundredths=$("hundredths").value||"0";
@@ -1291,35 +1322,12 @@ function submitPosition(){
 }
 
 function submitMulti(){
+    if (isProcessing) return;
     const multi1=$("multi1").value||"0";
     const multi2=$("multi2").value||"0";
     const multi3=$("multi3").value||"0";
     const ans=`${multi1},${multi2},${multi3}`;
     checkAnswer(ans,state.prob.a,"");
-}
-
-function checkAnswer(ans,correct,unit){
-    const isCorrect=ans.toString().toLowerCase()===correct.toString().toLowerCase();
-    
-    if(isCorrect){
-        state.score++;
-        if(state.mode==='practice')state.lvCount++;
-        else if(state.mode==='summary'){state.qNum++;state.totalQ++;}
-        else if(state.mode==='hidden')state.hiddenQ++;
-        else if(state.mode==='select')state.selectQCount++;
-        
-        addPoints(calculateCorrectPoints(state.level));
-        animate("correct");
-        
-        // 正解時に手書きスペースをクリア
-        setTimeout(() => {
-            clearHandwriting();
-        }, 1000);
-        
-        setTimeout(nextQ,1500);
-    }else{
-        showWrong(correct,unit);
-    }
 }
 
 function showWrong(correct,unit){
@@ -1453,7 +1461,7 @@ document.addEventListener('keydown',e=>{
 window.addEventListener('load',()=>{
     initializePlayerId();
     loadSelectModeCleared();
-    initHandwriting(); // 手書き機能を初期化
+    initDrawingSpace(); // 手書き機能を初期化
     $("playerIdDisplay").style.display="block";
     $("playerId").textContent=playerId;
     if(totalPoints>0){
@@ -1470,169 +1478,7 @@ window.addEventListener('load',()=>{
     }catch(e){}
 });
 </script>
+
 </body>
 </html>
 
-
-
-
-
-
-<!-- 手書き計算スペース（常時表示） -->
-<div id="handwritingSpace" style="margin-top:40px;padding:20px;background:#f0f8ff;border-radius:15px;border:3px solid #2196f3">
-<div class="info">
-<h2 style="color:#2196f3;margin:0 0 15px 0">📝 手書き計算スペース</h2>
-<p style="margin:0 0 15px 0;color:#666">マウスや指で自由に計算式や図を書けます</p>
-</div>
-<div style="background:white;border-radius:10px;padding:20px;border:2px solid #2196f3">
-<!-- クリアボタンを上部に移動 -->
-<div style="margin-bottom:15px;text-align:center">
-<button onclick="clearDrawCanvas()" style="background:#ff9800;color:white;border:none;padding:10px 20px;border-radius:6px;margin:5px;cursor:pointer;font-size:14px">🗑️ クリア</button>
-</div>
-<canvas id="drawArea" width="1600" height="1600" style="border:2px solid #2196f3;border-radius:8px;background:#fff;touch-action:none;display:block;margin:0 auto;cursor:crosshair"></canvas>
-<div style="font-size:14px;color:#666;margin-top:15px;text-align:center;background:#f8f9fa;padding:10px;border-radius:6px">
-💡 ヒント: 筆算や図を描いて問題を解いてみましょう！小数の位取りや計算過程を書くと理解が深まります。
-</div>
-</div>
-</div>
-
-<script>
-// 手書き描画機能の変数（名前を変更して競合を回避）
-let drawCanvas, drawCtx, isDrawingNow = false;
-
-// 手書きスペースの初期化
-function initDrawingSpace() {
-  drawCanvas = document.getElementById('drawArea');
-  if (!drawCanvas) {
-    console.log('Canvas element not found');
-    return;
-  }
-  
-  drawCtx = drawCanvas.getContext('2d');
-  if (!drawCtx) {
-    console.log('Canvas context not available');
-    return;
-  }
-  
-  // Canvas設定を明示的に設定
-  drawCtx.lineCap = 'round';
-  drawCtx.lineJoin = 'round';
-  drawCtx.lineWidth = 2;
-  drawCtx.strokeStyle = '#2196f3';
-  
-  console.log('Drawing space initialized');
-  setupDrawingEvents();
-}
-
-function getDrawPos(e) {
-  const rect = drawCanvas.getBoundingClientRect();
-  
-  if (e.touches && e.touches.length > 0) {
-    return {
-      x: e.touches[0].clientX - rect.left,
-      y: e.touches[0].clientY - rect.top
-    };
-  } else {
-    return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top
-    };
-  }
-}
-
-function setupDrawingEvents() {
-  if (!drawCanvas || !drawCtx) {
-    console.log('Canvas or context not available for event setup');
-    return;
-  }
-  
-  console.log('Setting up drawing events');
-  
-  // マウス操作
-  drawCanvas.addEventListener('mousedown', function(e) {
-    console.log('Mouse down');
-    isDrawingNow = true;
-    const pos = getDrawPos(e);
-    drawCtx.beginPath();
-    drawCtx.moveTo(pos.x, pos.y);
-    e.preventDefault();
-  });
-  
-  drawCanvas.addEventListener('mousemove', function(e) {
-    if (!isDrawingNow) return;
-    console.log('Mouse move - drawing');
-    const pos = getDrawPos(e);
-    drawCtx.lineTo(pos.x, pos.y);
-    drawCtx.stroke();
-    e.preventDefault();
-  });
-  
-  drawCanvas.addEventListener('mouseup', function(e) {
-    console.log('Mouse up');
-    isDrawingNow = false;
-    drawCtx.beginPath();
-    e.preventDefault();
-  });
-  
-  drawCanvas.addEventListener('mouseleave', function(e) {
-    isDrawingNow = false;
-    drawCtx.beginPath();
-  });
-
-  // タッチ操作（スマホ・タブレット対応）
-  drawCanvas.addEventListener('touchstart', function(e) {
-    console.log('Touch start');
-    e.preventDefault();
-    isDrawingNow = true;
-    const pos = getDrawPos(e);
-    drawCtx.beginPath();
-    drawCtx.moveTo(pos.x, pos.y);
-  }, { passive: false });
-  
-  drawCanvas.addEventListener('touchmove', function(e) {
-    if (!isDrawingNow) return;
-    console.log('Touch move - drawing');
-    e.preventDefault();
-    const pos = getDrawPos(e);
-    drawCtx.lineTo(pos.x, pos.y);
-    drawCtx.stroke();
-  }, { passive: false });
-  
-  drawCanvas.addEventListener('touchend', function(e) {
-    console.log('Touch end');
-    e.preventDefault();
-    isDrawingNow = false;
-    drawCtx.beginPath();
-  }, { passive: false });
-  
-  drawCanvas.addEventListener('touchcancel', function(e) {
-    e.preventDefault();
-    isDrawingNow = false;
-    drawCtx.beginPath();
-  }, { passive: false });
-}
-
-function clearDrawCanvas() {
-  if (!drawCtx || !drawCanvas) {
-    console.log('Canvas or context not available for clearing');
-    return;
-  }
-  console.log('Clearing canvas');
-  drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
-}
-
-// ページ読み込み時に手書きスペースを初期化
-window.addEventListener('load', function() {
-  console.log('Page loaded, initializing drawing space');
-  // 既存の初期化処理の後に手書きスペースを初期化
-  setTimeout(function() {
-    initDrawingSpace();
-  }, 1000); // 1秒後に初期化
-});
-
-// 手動初期化用の関数（デバッグ用）
-function manualInitDraw() {
-  console.log('Manual initialization');
-  initDrawingSpace();
-}
-</script>
