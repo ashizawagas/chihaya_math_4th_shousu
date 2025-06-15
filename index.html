@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>千早算数クエスト - 4年生小数版</title>
+<title>千早算数クエスト - 4年生小数版 with ボーナスゲーム</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
 <style>
@@ -109,8 +109,248 @@ input:disabled{background:#f5f5f5;cursor:not-allowed}
 .chart-canvas{width:100%!important;height:200px!important}
 .level-clear-screen{background:linear-gradient(45deg,#ff9a9e,#fecfef,#a8e6cf,#dcedc1);animation:rainbow 3s infinite;padding:40px;border-radius:20px;margin:20px}
 .level-clear-screen.paused{animation-play-state:paused}
-.processing-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.3);z-index:2000;display:flex;align-items:center;justify-content:center}
-.processing-message{background:white;padding:20px;border-radius:10px;border:2px solid #2196f3;font-size:18px;font-weight:bold;color:#2196f3}
+
+/* ボーナスゲーム用のスタイル */
+.bonus-game-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57);
+    background-size: 400% 400%;
+    animation: gradientShift 8s ease infinite;
+    z-index: 3000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.bonus-game-content {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 30px;
+    padding: 30px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    text-align: center;
+    max-width: 600px;
+    width: 90%;
+    position: relative;
+    overflow: hidden;
+}
+
+.bonus-game-content::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+    animation: shine 3s linear infinite;
+}
+
+@keyframes shine {
+    0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+}
+
+.bonus-game-content h1 {
+    color: #ff6b6b;
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-10px); }
+    60% { transform: translateY(-5px); }
+}
+
+.bonus-shooting-area {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    background: linear-gradient(to bottom, #87ceeb, #98fb98);
+    border-radius: 15px;
+    overflow: hidden;
+    margin: 20px 0;
+}
+
+.bonus-player {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 40px;
+    background: #ff6b6b;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: left 0.1s ease;
+}
+
+.bonus-falling-number {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(45deg, #feca57, #ff9ff3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    font-size: 18px;
+}
+
+.bonus-bullet {
+    position: absolute;
+    width: 8px;
+    height: 15px;
+    background: #ff6b6b;
+    border-radius: 4px;
+}
+
+.bonus-score {
+    font-size: 1.5em;
+    color: #333;
+    margin: 10px 0;
+    font-weight: bold;
+}
+
+.bonus-timer {
+    font-size: 1.3em;
+    color: #ff6b6b;
+    margin: 10px 0;
+    font-weight: bold;
+}
+
+.bonus-instructions {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    padding: 15px;
+    margin: 15px 0;
+    border: 2px solid #4ecdc4;
+    font-size: 1em;
+    color: #333;
+    line-height: 1.4;
+}
+
+.bonus-controls-info {
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px 0;
+    font-size: 0.9em;
+    color: #666;
+}
+
+.bonus-start-btn {
+    background: linear-gradient(45deg, #4ecdc4, #7dd3c0);
+    color: white;
+    border: none;
+    padding: 25px 50px;
+    margin: 20px;
+    border-radius: 30px;
+    font-size: 1.5em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.bonus-start-btn:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+    background: linear-gradient(45deg, #7dd3c0, #a8e6cf);
+}
+
+.bonus-back-btn {
+    background: linear-gradient(45deg, #95a5a6, #bdc3c7);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 15px;
+    cursor: pointer;
+    margin: 10px;
+    transition: all 0.3s ease;
+}
+
+.bonus-back-btn:hover {
+    transform: scale(1.1);
+}
+
+.bonus-target-display {
+    background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+    color: white;
+    border-radius: 20px;
+    padding: 25px;
+    margin: 20px 0;
+    border: 3px solid #ff4757;
+    box-shadow: 0 10px 20px rgba(255, 71, 87, 0.3);
+    animation: glow 2s ease-in-out infinite;
+}
+
+.bonus-target-display h3 {
+    font-size: 1.8em;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.bonus-target-display .target-number {
+    font-size: 3em;
+    font-weight: bold;
+    margin: 10px 0;
+    text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
+}
+
+@keyframes glow {
+    0%, 100% { box-shadow: 0 10px 20px rgba(255, 71, 87, 0.3); }
+    50% { box-shadow: 0 15px 30px rgba(255, 71, 87, 0.6); }
+}
+
+.bonus-stars {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.bonus-star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle 2s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+
+.bonus-level-info {
+    background: linear-gradient(45deg, #4ecdc4, #7dd3c0);
+    color: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin: 15px 0;
+    font-size: 1.2em;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
 </style>
 </head>
 <body>
@@ -122,8 +362,8 @@ input:disabled{background:#f5f5f5;cursor:not-allowed}
 <div id="pointsDisplay" class="points-display" style="display:none">💰 総ポイント: <span id="totalPoints">0</span>P</div>
 <div class="info">
 <div class="mode-info select"><h3>🎮 選べるモード</h3><p>• 好きなレベルを選んで練習<br>• 10問連続正解でクリア<br>• 間違えるとカウント0に戻る<br>• 正解でポイント獲得</p></div>
-<div class="mode-info practice"><h3>📚 練習モード</h3><p>• 各レベルで5問連続正解で次のレベルへ<br>• 間違えたらそのレベルのカウントが0に戻る<br>• レベルアップでボーナスポイント<br>• <strong>選べるモードの3倍のポイント獲得！</strong></p></div>
-<div class="mode-info summary"><h3>🎯 まとめモード</h3><p>• 全11レベル×各5問＝計55問に挑戦<br>• 一問でも間違えるとゲームオーバー<br>• クリア時間に応じて大量ポイント獲得<br>• <strong>クリアで隠しステージ解放！</strong></p></div>
+<div class="mode-info practice"><h3>📚 練習モード</h3><p>• 各レベルで5問連続正解で次のレベルへ<br>• 間違えたらそのレベルのカウントが0に戻る<br>• レベルアップでボーナスポイント<br>• <strong>レベルクリア時にボーナスゲーム！</strong><br>• <strong>選べるモードの3倍のポイント獲得！</strong></p></div>
+<div class="mode-info summary"><h3>🎯 まとめモード</h3><p>• 全11レベル×各5問＝計55問に挑戦<br>• 一問でも間違えるとゲームオーバー<br>• クリア時間に応じて大量ポイント獲得<br>• <strong>レベルクリア時にボーナスゲーム！</strong><br>• <strong>クリアで隠しステージ解放！</strong></p></div>
 <div id="hiddenModeInfo" class="mode-info hidden" style="display:none"><h3>👑 隠しステージ</h3><p>• 超高難度の小数問題に挑戦<br>• 全10問クリアで「小数マスター」の称号獲得<br>• 派手なアニメーションで祝福！</p></div>
 </div>
 <button class="mode-btn select" onclick="showLevelSelect()">🎮 選べるモード</button>
@@ -313,17 +553,87 @@ input:disabled{background:#f5f5f5;cursor:not-allowed}
 </div>
 </div>
 
-<!-- 処理中オーバーレイ -->
-<div id="processingOverlay" class="processing-overlay" style="display:none">
-<div class="processing-message">処理中...</div>
+<!-- ボーナスゲーム -->
+<div id="bonusGameContainer" class="bonus-game-container">
+<div class="bonus-stars" id="bonusStars"></div>
+<div class="bonus-game-content">
+<h1>🎯 ボーナスゲーム！</h1>
+
+<!-- ボーナスゲーム設定画面 -->
+<div id="bonusGameSetup">
+<div class="bonus-level-info" id="bonusLevelInfo">
+レベル<span id="bonusCurrentLevel">1</span>クリア記念！
+</div>
+<div class="bonus-instructions">
+<h3>🎯 シューティングゲーム</h3>
+<p>指定された九九の段の数字を撃ち落とそう！制限時間は30秒です。</p>
+</div>
+
+<div class="bonus-target-display" id="bonusTargetDisplay">
+<h3>🎯 ターゲットの段</h3>
+<div class="target-number" id="bonusTargetNumber">?</div>
+<p>この段の数字を狙って撃とう！</p>
+</div>
+
+<div class="bonus-instructions">
+<strong>ルール：</strong><br>
+表示された段の数字にあてると10点、その他の数字にあてるとマイナス5点です。<br>
+制限時間は30秒で、ターゲットの段の数字は20個、その他の数字は60個落ちてきます。<br>
+<strong>獲得したポイントは千早算数クエストのポイントに追加されます！</strong>
+</div>
+
+<button class="bonus-start-btn" onclick="startBonusShootingGame()">
+🚀 ゲーム開始！
+</button>
+<button class="bonus-back-btn" onclick="skipBonusGame()">
+スキップして次のレベルへ
+</button>
+</div>
+
+<!-- ボーナスシューティングゲーム -->
+<div id="bonusShootingGame" style="display:none">
+<h2>🎯 ボーナスシューティング！</h2>
+<div class="bonus-instructions" id="bonusGameInstructions">
+<!-- ここに詳細な説明が入ります -->
+</div>
+<div class="bonus-controls-info">
+移動: ←→キー または タッチ | 発射: スペース または エンター
+</div>
+<div class="bonus-timer" id="bonusGameTimer">残り時間: 30秒</div>
+<div class="bonus-score" id="bonusGameScore">スコア: 0</div>
+<div class="bonus-shooting-area" id="bonusShootingArea">
+<div class="bonus-player" id="bonusPlayer"></div>
+</div>
+</div>
+</div>
 </div>
 
 <script>
 const $=id=>document.getElementById(id)||{style:{},textContent:'',innerHTML:'',value:'',classList:{add:()=>{},remove:()=>{}},appendChild:()=>{},remove:()=>{},focus:()=>{},disabled:false};
-let state={score:0,level:1,prob:null,unit:"",mode:"",lvCount:0,totalQ:0,qNum:0,completed:new Set(),selectedChoice:null,selectQCount:0,startTime:null,timerInterval:null,hiddenQ:0,sessionPoints:0,isProcessing:false,lastAnswerTime:0};
+let state={score:0,level:1,prob:null,unit:"",mode:"",lvCount:0,totalQ:0,qNum:0,completed:new Set(),selectedChoice:null,selectQCount:0,startTime:null,timerInterval:null,hiddenQ:0,sessionPoints:0,isProcessing:false,lastAnswerTime:0,pendingLevelUp:false,waitingForBonus:false};
 const monsters=["🎯","🌟","💎","🎨","🎪","🎭","🎵","🎸","🎲","👑","🌈"];
 const lvNames=["たんいへんかん","小数の仕組み","小数の位","小数の大小","小数 何倍か","小数 何分の一か","小数のこうせい","小数の足し算","小数のひき算","小数文章問題","小数の色々な見方"];
 let totalPoints=0,hiddenStageAvailable=false,playerId='',selectModeCleared=new Set();
+
+// ボーナスゲーム関連の変数（修正版）
+let bonusGameState = {
+    currentTable: 2,
+    gameScore: 0,
+    targetNumbers: [],
+    gameTimer: null,
+    timeRemaining: 30,
+    bulletSpeed: 5,
+    numberSpeed: 1.8,
+    playerPosition: 50,
+    keys: {},
+    shootingAreaWidth: 0,
+    targetInterval: null,
+    otherInterval: null,
+    bullets: [],
+    fallingNumbers: [], // 修正: fallingNumbers配列を復元
+    isActive: false,
+    completedLevel: 1
+};
 
 // 手書き描画機能の変数
 let drawCanvas, drawCtx, isDrawingNow = false;
@@ -360,14 +670,6 @@ function enableAllInputs() {
     });
     
     buttons.forEach(btn => btn.disabled = false);
-}
-
-function showProcessingOverlay() {
-    $("processingOverlay").style.display = "flex";
-}
-
-function hideProcessingOverlay() {
-    $("processingOverlay").style.display = "none";
 }
 
 // 手書きスペースの初期化
@@ -658,17 +960,6 @@ function createPointsChart(canvasId){
                         font: {
                             size: 10
                         },
-                        maxTicksLimit: 6
-                    }
-                },
-                x:{
-                    grid:{
-                        color:'rgba(0,0,0,0.1)'
-                    },
-                    ticks: {
-                        font: {
-                            size: 10
-                        },
                         maxTicksLimit: 8
                     }
                 }
@@ -685,6 +976,7 @@ function createPointsChart(canvasId){
         }
     });
 }
+
 
 function enableHiddenStage(){hiddenStageAvailable=true;$("hiddenStageBtn").style.display="inline-block";$("hiddenModeInfo").style.display="block"}
 function disableHiddenStage(){hiddenStageAvailable=false;$("hiddenStageBtn").style.display="none";$("hiddenModeInfo").style.display="none"}
@@ -728,7 +1020,12 @@ function addPoints(points,showAnimation=true){
     if(showAnimation)showPointsAnimation(points);
 }
 
-function showPointsAnimation(points){const pointsDiv=document.createElement('div');pointsDiv.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:linear-gradient(45deg,#ffd700,#ffed4e);color:#d32f2f;padding:20px;border-radius:15px;font-size:24px;font-weight:bold;z-index:3000;animation:pointsEarn 2s;border:3px solid #ff6b6b;">+${points}P 獲得！</div>`;document.body.appendChild(pointsDiv);setTimeout(()=>pointsDiv.remove(),2000)}
+function showPointsAnimation(points){
+    const pointsDiv=document.createElement('div');
+    pointsDiv.innerHTML=`<div style="position:fixed;top:50%;left:70%;transform:translate(-50%,-50%);background:linear-gradient(45deg,#ffd700,#ffed4e);color:#d32f2f;padding:20px;border-radius:15px;font-size:24px;font-weight:bold;z-index:3000;animation:pointsEarn 2s;border:3px solid #ff6b6b;">+${points}P 獲得！</div>`;
+    document.body.appendChild(pointsDiv);
+    setTimeout(()=>pointsDiv.remove(),2000);
+}
 
 function startTimer(){if(state.mode==='summary'||state.mode==='hidden'){state.startTime=Date.now();$("timerDisplay").style.display="block";state.timerInterval=setInterval(updateTimer,1000)}}
 function updateTimer(){if(state.startTime){const elapsed=Math.floor((Date.now()-state.startTime)/1000);$("timer").textContent=formatTime(elapsed)}}
@@ -758,6 +1055,436 @@ function pauseAnimationAfterDelay(elementId, delay = 3000) {
             masterElement.classList.add('paused');
         }
     }, delay);
+}
+
+// ボーナスゲーム関連の関数（修正版）
+function showBonusGame(completedLevel) {
+    bonusGameState.completedLevel = completedLevel;
+    bonusGameState.currentTable = Math.floor(Math.random() * 8) + 2;
+    
+    $("bonusCurrentLevel").textContent = completedLevel;
+    $("bonusTargetNumber").textContent = `${bonusGameState.currentTable}の段`;
+    
+    $("bonusGameContainer").style.display = "flex";
+    $("bonusGameSetup").style.display = "block";
+    $("bonusShootingGame").style.display = "none";
+    
+    createBonusStars();
+}
+
+function createBonusStars() {
+    const starsContainer = $("bonusStars");
+    starsContainer.innerHTML = "";
+    for (let i = 0; i < 30; i++) {
+        const star = document.createElement('div');
+        star.className = 'bonus-star';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.width = star.style.height = Math.random() * 3 + 1 + 'px';
+        star.style.animationDelay = Math.random() * 2 + 's';
+        starsContainer.appendChild(star);
+    }
+}
+
+function startBonusShootingGame() {
+    $("bonusGameSetup").style.display = "none";
+    $("bonusShootingGame").style.display = "block";
+    
+    bonusGameState.gameScore = 0;
+    bonusGameState.timeRemaining = 30;
+    bonusGameState.playerPosition = 50;
+    bonusGameState.bullets = [];
+    bonusGameState.fallingNumbers = []; // 修正: fallingNumbers配列を初期化
+    bonusGameState.isActive = true;
+    
+    // ターゲット数字を設定
+    bonusGameState.targetNumbers = [];
+    for (let i = 1; i <= 9; i++) {
+        bonusGameState.targetNumbers.push(bonusGameState.currentTable * i);
+    }
+    
+    const shootingArea = $("bonusShootingArea");
+    bonusGameState.shootingAreaWidth = shootingArea.offsetWidth;
+    
+    const instructionsElement = $("bonusGameInstructions");
+    instructionsElement.innerHTML = `
+        <strong>${bonusGameState.currentTable}の段の数字にあてると10点、その他の数字にあてるとマイナス5点だよ</strong>
+    `;
+    
+    updateBonusGameScore();
+    updateBonusTimer();
+    updateBonusPlayerPosition();
+    startBonusFallingNumbers();
+    setupBonusShooting();
+    
+    bonusGameState.gameTimer = setInterval(() => {
+        bonusGameState.timeRemaining--;
+        updateBonusTimer();
+        if (bonusGameState.timeRemaining <= 0) {
+            endBonusShootingGame();
+        }
+    }, 1000);
+}
+
+function updateBonusPlayerPosition() {
+    const player = $("bonusPlayer");
+    const shootingArea = $("bonusShootingArea");
+    
+    const playerWidth = 40;
+    const maxPosition = shootingArea.offsetWidth - playerWidth;
+    const leftPos = Math.max(0, Math.min(maxPosition, (bonusGameState.playerPosition / 100) * shootingArea.offsetWidth - playerWidth / 2));
+    
+    player.style.left = leftPos + 'px';
+    player.style.transform = 'none';
+}
+
+function updateBonusTimer() {
+    $("bonusGameTimer").textContent = `残り時間: ${bonusGameState.timeRemaining}秒`;
+}
+
+function updateBonusGameScore() {
+    $("bonusGameScore").textContent = `スコア: ${bonusGameState.gameScore}`;
+}
+
+function startBonusFallingNumbers() {
+    // ターゲット数字（30秒で20個 = 1.5秒間隔）
+    bonusGameState.targetInterval = setInterval(() => {
+        if (bonusGameState.timeRemaining > 0 && bonusGameState.isActive) {
+            createBonusTargetNumber();
+        }
+    }, 1500);
+    
+    // その他の数字（30秒で60個 = 0.5秒間隔）
+    bonusGameState.otherInterval = setInterval(() => {
+        if (bonusGameState.timeRemaining > 0 && bonusGameState.isActive) {
+            createBonusOtherNumber();
+        }
+    }, 500);
+}
+
+// 修正: ターゲット数字生成時にfallingNumbers配列に追加
+function createBonusTargetNumber() {
+    if (bonusGameState.timeRemaining <= 0 || !bonusGameState.isActive) return;
+    
+    const shootingArea = $("bonusShootingArea");
+    const number = document.createElement('div');
+    number.className = 'bonus-falling-number';
+    
+    const targetNum = bonusGameState.targetNumbers[Math.floor(Math.random() * bonusGameState.targetNumbers.length)];
+    number.textContent = targetNum;
+    number.dataset.value = targetNum;
+    number.dataset.isTarget = 'true';
+    
+    const numberWidth = 50;
+    const maxLeft = shootingArea.offsetWidth - numberWidth;
+    number.style.left = Math.random() * maxLeft + 'px';
+    number.style.top = '0px';
+    
+    shootingArea.appendChild(number);
+    bonusGameState.fallingNumbers.push(number); // 修正: 配列に追加
+    animateBonusFallingNumber(number);
+}
+
+// 修正: その他の数字生成時にfallingNumbers配列に追加
+function createBonusOtherNumber() {
+    if (bonusGameState.timeRemaining <= 0 || !bonusGameState.isActive) return;
+    
+    const shootingArea = $("bonusShootingArea");
+    const number = document.createElement('div');
+    number.className = 'bonus-falling-number';
+    
+    let randomNum;
+    do {
+        randomNum = Math.floor(Math.random() * 81) + 1;
+    } while (bonusGameState.targetNumbers.includes(randomNum));
+    
+    number.textContent = randomNum;
+    number.dataset.value = randomNum;
+    number.dataset.isTarget = 'false';
+    
+    const numberWidth = 50;
+    const maxLeft = shootingArea.offsetWidth - numberWidth;
+    number.style.left = Math.random() * maxLeft + 'px';
+    number.style.top = '0px';
+    
+    shootingArea.appendChild(number);
+    bonusGameState.fallingNumbers.push(number); // 修正: 配列に追加
+    animateBonusFallingNumber(number);
+}
+
+// 修正: 画面外に出た数字を配列からも削除
+function animateBonusFallingNumber(number) {
+    const fallInterval = setInterval(() => {
+        const currentTop = parseInt(number.style.top);
+        const shootingArea = $("bonusShootingArea");
+        
+        if (currentTop > shootingArea.offsetHeight || bonusGameState.timeRemaining <= 0 || !bonusGameState.isActive) {
+            if (number.parentNode) {
+                number.remove();
+            }
+            // 修正: fallingNumbers配列からも削除
+            const numberIndex = bonusGameState.fallingNumbers.indexOf(number);
+            if (numberIndex > -1) {
+                bonusGameState.fallingNumbers.splice(numberIndex, 1);
+            }
+            clearInterval(fallInterval);
+        } else {
+            number.style.top = (currentTop + bonusGameState.numberSpeed) + 'px';
+        }
+    }, 20);
+}
+
+function setupBonusShooting() {
+    const shootingArea = $("bonusShootingArea");
+    
+    // タッチイベント
+    shootingArea.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        const rect = shootingArea.getBoundingClientRect();
+        const x = e.touches[0].clientX - rect.left;
+        bonusGameState.playerPosition = Math.max(5, Math.min(95, (x / shootingArea.offsetWidth) * 100));
+        updateBonusPlayerPosition();
+    });
+    
+    shootingArea.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        const rect = shootingArea.getBoundingClientRect();
+        const x = e.touches[0].clientX - rect.left;
+        bonusGameState.playerPosition = Math.max(5, Math.min(95, (x / shootingArea.offsetWidth) * 100));
+        updateBonusPlayerPosition();
+    });
+    
+    shootingArea.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        if (bonusGameState.isActive) {
+            fireBonusBullet();
+        }
+    });
+    
+    // マウスイベント
+    shootingArea.addEventListener('mousemove', (e) => {
+        const rect = shootingArea.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        bonusGameState.playerPosition = Math.max(5, Math.min(95, (x / shootingArea.offsetWidth) * 100));
+        updateBonusPlayerPosition();
+    });
+    
+    shootingArea.addEventListener('click', (e) => {
+        if (bonusGameState.timeRemaining > 0 && bonusGameState.isActive) {
+            fireBonusBullet();
+        }
+    });
+    
+    // キー移動の処理（16msごとに更新でスムーズな移動）
+    const moveInterval = setInterval(() => {
+        if (bonusGameState.timeRemaining <= 0 || !bonusGameState.isActive) {
+            clearInterval(moveInterval);
+            return;
+        }
+        
+        if (bonusGameState.keys['ArrowLeft'] || bonusGameState.keys['a'] || bonusGameState.keys['A']) {
+            bonusGameState.playerPosition = Math.max(5, bonusGameState.playerPosition - 2);
+            updateBonusPlayerPosition();
+        }
+        if (bonusGameState.keys['ArrowRight'] || bonusGameState.keys['d'] || bonusGameState.keys['D']) {
+            bonusGameState.playerPosition = Math.min(95, bonusGameState.playerPosition + 2);
+            updateBonusPlayerPosition();
+        }
+    }, 16);
+}
+
+function fireBonusBullet() {
+    const shootingArea = $("bonusShootingArea");
+    const player = $("bonusPlayer");
+    const bullet = document.createElement('div');
+    bullet.className = 'bonus-bullet';
+    
+    const playerRect = player.getBoundingClientRect();
+    const shootingRect = shootingArea.getBoundingClientRect();
+    const bulletX = playerRect.left - shootingRect.left + 16;
+    
+    bullet.style.left = bulletX + 'px';
+    bullet.style.bottom = '50px';
+    
+    shootingArea.appendChild(bullet);
+    bonusGameState.bullets.push(bullet);
+    
+    const bulletInterval = setInterval(() => {
+        const currentBottom = parseInt(bullet.style.bottom);
+        if (currentBottom > shootingArea.offsetHeight || bonusGameState.timeRemaining <= 0 || !bonusGameState.isActive) {
+            if (bullet.parentNode) {
+                bullet.remove();
+            }
+            const bulletIndex = bonusGameState.bullets.indexOf(bullet);
+            if (bulletIndex > -1) {
+                bonusGameState.bullets.splice(bulletIndex, 1);
+            }
+            clearInterval(bulletInterval);
+        } else {
+            bullet.style.bottom = (currentBottom + bonusGameState.bulletSpeed) + 'px';
+            
+            // 衝突判定を実行し、衝突した場合は弾を停止
+            if (checkBonusCollision(bullet)) {
+                if (bullet.parentNode) {
+                    bullet.remove();
+                }
+                const bulletIndex = bonusGameState.bullets.indexOf(bullet);
+                if (bulletIndex > -1) {
+                    bonusGameState.bullets.splice(bulletIndex, 1);
+                }
+                clearInterval(bulletInterval);
+            }
+        }
+    }, 20);
+}
+
+// 修正: 衝突判定でfallingNumbers配列からも削除
+function checkBonusCollision(bullet) {
+    const bulletRect = bullet.getBoundingClientRect();
+    const numbers = document.querySelectorAll('.bonus-falling-number');
+    
+    for (let i = 0; i < numbers.length; i++) {
+        const number = numbers[i];
+        const numberRect = number.getBoundingClientRect();
+        
+        if (bulletRect.left < numberRect.right &&
+            bulletRect.right > numberRect.left &&
+            bulletRect.top < numberRect.bottom &&
+            bulletRect.bottom > numberRect.top) {
+            
+            const value = parseInt(number.dataset.value);
+            const isTarget = number.dataset.isTarget === 'true';
+            
+            if (isTarget) {
+                bonusGameState.gameScore += 10;
+            } else {
+                bonusGameState.gameScore = Math.max(0, bonusGameState.gameScore - 5);
+            }
+            
+            updateBonusGameScore();
+            
+            // 数字を削除
+            if (number.parentNode) {
+                number.remove();
+            }
+            
+            // 修正: fallingNumbers配列からも削除
+            const numberIndex = bonusGameState.fallingNumbers.indexOf(number);
+            if (numberIndex > -1) {
+                bonusGameState.fallingNumbers.splice(numberIndex, 1);
+            }
+            
+            return true; // 衝突したことを返す
+        }
+    }
+    
+    return false; // 衝突しなかった
+}
+
+function endBonusShootingGame() {
+    bonusGameState.isActive = false;
+    
+    if (bonusGameState.targetInterval) {
+        clearInterval(bonusGameState.targetInterval);
+    }
+    if (bonusGameState.otherInterval) {
+        clearInterval(bonusGameState.otherInterval);
+    }
+    if (bonusGameState.gameTimer) {
+        clearInterval(bonusGameState.gameTimer);
+    }
+    
+    setTimeout(() => {
+        const earnedPoints = Math.max(0, bonusGameState.gameScore);
+        addPoints(earnedPoints);
+        
+        hideBonusGame();
+        
+        // レベルアップ処理を続行
+        if (state.mode === 'practice') {
+            if (bonusGameState.completedLevel >= 11) {
+                showClear();
+            } else {
+                state.level++;
+                state.lvCount = 0;
+                animate("level-up");
+                updateLevelIndicator();
+                updateDisplay();
+                nextQ();
+            }
+        } else if (state.mode === 'summary') {
+            if (bonusGameState.completedLevel >= 11) {
+                showClear();
+            } else {
+                state.level++;
+                state.qNum = 0;
+                animate("level-up");
+                updateLevelIndicator();
+                updateDisplay();
+                nextQ();
+            }
+        }
+    }, 1000);
+}
+
+function skipBonusGame() {
+    hideBonusGame();
+    
+    // レベルアップ処理を続行
+    if (state.mode === 'practice') {
+        if (bonusGameState.completedLevel >= 11) {
+            showClear();
+        } else {
+            state.level++;
+            state.lvCount = 0;
+            animate("level-up");
+            updateLevelIndicator();
+            updateDisplay();
+            nextQ();
+        }
+    } else if (state.mode === 'summary') {
+        if (bonusGameState.completedLevel >= 11) {
+            showClear();
+        } else {
+            state.level++;
+            state.qNum = 0;
+            animate("level-up");
+            updateLevelIndicator();
+            updateDisplay();
+            nextQ();
+        }
+    }
+}
+
+// 修正: ゲーム終了時のクリーンアップでfallingNumbers配列もクリア
+function hideBonusGame() {
+    $("bonusGameContainer").style.display = "none";
+    
+    if (bonusGameState.targetInterval) {
+        clearInterval(bonusGameState.targetInterval);
+        bonusGameState.targetInterval = null;
+    }
+    if (bonusGameState.otherInterval) {
+        clearInterval(bonusGameState.otherInterval);
+        bonusGameState.otherInterval = null;
+    }
+    if (bonusGameState.gameTimer) {
+        clearInterval(bonusGameState.gameTimer);
+        bonusGameState.gameTimer = null;
+    }
+    
+    bonusGameState.bullets = [];
+    bonusGameState.fallingNumbers = []; // 修正: fallingNumbers配列もクリア
+    bonusGameState.isActive = false;
+    
+    const shootingArea = $("bonusShootingArea");
+    if (shootingArea) {
+        shootingArea.querySelectorAll('.bonus-falling-number, .bonus-bullet').forEach(el => {
+            if (el.parentNode) {
+                el.remove();
+            }
+        });
+    }
 }
 
 // 小数問題生成関数
@@ -1057,18 +1784,15 @@ function generateProblem(level){
 }
 
 // 連打防止機能付きの回答処理関数
-let isProcessing = false;
-let lastAnswerTime = 0;
-
 function checkAnswer(ans, correct, unit) {
     // 連打防止チェック
     const now = Date.now();
-    if (isProcessing || (now - lastAnswerTime < 500)) {
+    if (state.isProcessing || (now - state.lastAnswerTime < 500)) {
         return;
     }
     
-    isProcessing = true;
-    lastAnswerTime = now;
+    state.isProcessing = true;
+    state.lastAnswerTime = now;
     
     const isCorrect = ans.toString().toLowerCase() === correct.toString().toLowerCase();
     
@@ -1088,12 +1812,26 @@ function checkAnswer(ans, correct, unit) {
         }, 1000);
         
         setTimeout(() => {
-            isProcessing = false;
+            state.isProcessing = false;
+            
+            // レベルクリア判定とボーナスゲーム移行
+            if (state.mode === 'practice' && state.lvCount >= 5) {
+                state.completed.add(state.level);
+                addPoints(calculateLevelPoints(state.level));
+                showBonusGame(state.level);
+                return;
+            } else if (state.mode === 'summary' && state.qNum >= 5) {
+                state.completed.add(state.level);
+                addPoints(calculateLevelPoints(state.level));
+                showBonusGame(state.level);
+                return;
+            }
+            
             nextQ();
         }, 1500);
     } else {
         setTimeout(() => {
-            isProcessing = false;
+            state.isProcessing = false;
             showWrong(correct, unit);
         }, 500);
     }
@@ -1104,7 +1842,7 @@ function showLevelSelect(){$("start").style.display="none";$("levelSelect").styl
 function backToStart(){stopTimer();disableHiddenStage();["start","levelSelect","game","gameover","clear","hiddenClear","levelClear"].forEach(id=>$(id).style.display="none");$("start").style.display="block";$("timerDisplay").style.display="none"}
 function restart(){backToStart()}
 
-function selectLevel(lv){state={score:0,level:lv,prob:null,unit:"",mode:"select",lvCount:0,totalQ:0,qNum:0,completed:new Set(),selectedChoice:null,selectQCount:0,startTime:null,timerInterval:null,hiddenQ:0,sessionPoints:0};$("levelSelect").style.display="none";$("game").style.display="block";updateDisplay();updateLevelIndicator();nextQ()}
+function selectLevel(lv){state={score:0,level:lv,prob:null,unit:"",mode:"select",lvCount:0,totalQ:0,qNum:0,completed:new Set(),selectedChoice:null,selectQCount:0,startTime:null,timerInterval:null,hiddenQ:0,sessionPoints:0,isProcessing:false,lastAnswerTime:0,pendingLevelUp:false,waitingForBonus:false};$("levelSelect").style.display="none";$("game").style.display="block";updateDisplay();updateLevelIndicator();nextQ()}
 
 function backToLevelSelect(){
     stopTimer();
@@ -1120,9 +1858,9 @@ function selectMode(m){
         return;
     }
     if(m==='hidden'){
-        state={score:0,level:12,prob:null,unit:"",mode:"hidden",lvCount:0,totalQ:0,qNum:0,completed:new Set(),selectedChoice:null,selectQCount:0,startTime:null,timerInterval:null,hiddenQ:0,sessionPoints:0};
+        state={score:0,level:12,prob:null,unit:"",mode:"hidden",lvCount:0,totalQ:0,qNum:0,completed:new Set(),selectedChoice:null,selectQCount:0,startTime:null,timerInterval:null,hiddenQ:0,sessionPoints:0,isProcessing:false,lastAnswerTime:0,pendingLevelUp:false,waitingForBonus:false};
     }else{
-        state={score:0,level:1,prob:null,unit:"",mode:m,lvCount:0,totalQ:0,qNum:0,completed:new Set(),selectedChoice:null,selectQCount:0,startTime:null,timerInterval:null,hiddenQ:0,sessionPoints:0};
+        state={score:0,level:1,prob:null,unit:"",mode:m,lvCount:0,totalQ:0,qNum:0,completed:new Set(),selectedChoice:null,selectQCount:0,startTime:null,timerInterval:null,hiddenQ:0,sessionPoints:0,isProcessing:false,lastAnswerTime:0,pendingLevelUp:false,waitingForBonus:false};
     }
     $("start").style.display="none";
     $("game").style.display="block";
@@ -1202,36 +1940,10 @@ function nextQ(){
             showHiddenClear();
             return;
         }
-    }else if(state.mode==='practice'){
-        if(state.lvCount>=5){
-            state.completed.add(state.level);
-            addPoints(calculateLevelPoints(state.level));
-            if(state.level>=11){
-                showClear();
-                return;
-            }
-            state.level++;
-            state.lvCount=0;
-            animate("level-up");
-            updateLevelIndicator();
-        }
     }else if(state.mode==='select'){
         if(state.selectQCount>=10){
             showLevelClear();
             return;
-        }
-    }else if(state.mode!=='select'){
-        if(state.level>=11&&state.qNum>=5){
-            showClear();
-            return;
-        }
-        if(state.qNum>=5){
-            state.completed.add(state.level);
-            addPoints(calculateLevelPoints(state.level));
-            state.level++;
-            state.qNum=0;
-            animate("level-up");
-            updateLevelIndicator();
         }
     }
     
@@ -1302,7 +2014,7 @@ function selectChoice(choice){
 }
 
 function submitNormal(){
-    if (isProcessing) return;
+    if (state.isProcessing) return;
     const ans=$("norm").value.trim();
     if(!ans){
         showError("答えを入力してください");
@@ -1312,7 +2024,7 @@ function submitNormal(){
 }
 
 function submitPosition(){
-    if (isProcessing) return;
+    if (state.isProcessing) return;
     const ones=$("ones").value||"0";
     const tenths=$("tenths").value||"0";
     const hundredths=$("hundredths").value||"0";
@@ -1322,7 +2034,7 @@ function submitPosition(){
 }
 
 function submitMulti(){
-    if (isProcessing) return;
+    if (state.isProcessing) return;
     const multi1=$("multi1").value||"0";
     const multi2=$("multi2").value||"0";
     const multi3=$("multi3").value||"0";
@@ -1447,7 +2159,18 @@ function showHiddenClear(){
     disableHiddenStage();
 }
 
-document.addEventListener('keydown',e=>{
+// ボーナスゲーム用のキーイベント処理
+document.addEventListener('keydown', (e) => {
+    bonusGameState.keys[e.key] = true;
+    
+    if ((e.key === ' ' || e.key === 'Enter') && bonusGameState.isActive) {
+        e.preventDefault();
+        if (bonusGameState.timeRemaining > 0) {
+            fireBonusBullet();
+        }
+    }
+    
+    // メインゲームのキーイベント
     if(e.key==='Enter'){
         if($("game").style.display!=="none"){
             if(state.prob?.type==='position')submitPosition();
@@ -1458,10 +2181,14 @@ document.addEventListener('keydown',e=>{
     }
 });
 
+document.addEventListener('keyup', (e) => {
+    bonusGameState.keys[e.key] = false;
+});
+
 window.addEventListener('load',()=>{
     initializePlayerId();
     loadSelectModeCleared();
-    initDrawingSpace(); // 手書き機能を初期化
+    initDrawingSpace();
     $("playerIdDisplay").style.display="block";
     $("playerId").textContent=playerId;
     if(totalPoints>0){
@@ -1481,4 +2208,3 @@ window.addEventListener('load',()=>{
 
 </body>
 </html>
-
